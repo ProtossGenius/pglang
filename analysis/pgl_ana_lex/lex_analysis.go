@@ -10,6 +10,7 @@ import (
 const (
 	PGLA_PRODUCT_ = iota
 	PGLA_PRODUCT_IDENT
+	PGLA_PRODUCT_SPACE
 )
 const (
 	ErrTypeNotMatch = "ErrTypeNotMatch: AnalysisReader %s, input [%s], reason %s "
@@ -43,6 +44,7 @@ func NewLexAnalysiser() *smn_analysis.StateMachine {
 	sm := new(smn_analysis.StateMachine).Init()
 	dft := smn_analysis.NewDftStateNodeReader(sm)
 	dft.Register(&IdentifierReader{})
+	dft.Register(&SpaceReader{})
 	return sm
 }
 func (this *IdentifierReader) onErr(inputs, reason string) error {
@@ -61,7 +63,7 @@ func (this *IdentifierReader) PreRead(stateNode *smn_analysis.StateNode, input s
 			return true, this.onErr(charStr, "Not Identifier")
 		}
 	} else {
-		if !unicode.IsDigit(char) && !unicode.IsNumber(char) && char == '_' {
+		if !unicode.IsDigit(char) && !unicode.IsLetter(char) && char != '_' {
 			return true, nil
 		}
 	}
@@ -70,6 +72,7 @@ func (this *IdentifierReader) PreRead(stateNode *smn_analysis.StateNode, input s
 
 //real read. even isEnd == true the input be readed.
 func (this *IdentifierReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	this.first = false
 	char := read(input)
 	charStr := string([]rune{char})
 	this.result.Name += charStr
@@ -85,4 +88,43 @@ func (this *IdentifierReader) GetProduct() smn_analysis.ProductItf {
 func (this *IdentifierReader) Clean() {
 	this.first = true
 	this.result = &PglaIdent{}
+}
+
+type PglaSpace struct {
+	Char rune
+}
+
+func (p *PglaSpace) ProductType() int {
+	return PGLA_PRODUCT_SPACE
+}
+
+type SpaceReader struct {
+	Result *PglaSpace
+}
+
+//only see if should stop read.
+func (p *SpaceReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	char := read(input)
+	charStr := string([]rune{char})
+	if unicode.IsSpace(char) {
+		return false, nil
+	}
+	return true, fmt.Errorf(ErrTypeNotMatch, "SpaceReader", charStr, "Not Space char")
+}
+
+//real read. even isEnd == true the input be readed.
+func (p *SpaceReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	char := read(input)
+	p.Result = &PglaSpace{Char: char}
+	return true, nil
+}
+
+//return result
+func (p *SpaceReader) GetProduct() smn_analysis.ProductItf {
+	return p.Result
+}
+
+//let the Reader like new.  it will be call before first Read
+func (p *SpaceReader) Clean() {
+	p.Result = nil
 }
