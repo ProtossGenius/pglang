@@ -20,6 +20,11 @@ type PglaInput struct {
 	Char rune
 }
 
+type LexProduct struct {
+	Type  int    `json:"type"`
+	Value string `json:"value"`
+}
+
 func (p *PglaInput) Copy() smn_analysis.InputItf {
 	return &PglaInput{Char: p.Char}
 }
@@ -40,6 +45,21 @@ type IdentifierReader struct {
 	result *PglaIdent
 }
 
+func ToLexProduct(input smn_analysis.ProductItf) *LexProduct {
+	product := &LexProduct{Type: input.ProductType()}
+	switch product.Type {
+	case -1:
+		product.Value = "end"
+	case -2:
+		product.Value = input.(*smn_analysis.ProductDftNode).Reason
+	case PGLA_PRODUCT_IDENT:
+		product.Value = input.(*PglaIdent).Name
+	case PGLA_PRODUCT_SPACE:
+		product.Value = input.(*PglaSpace).Char
+	default:
+	}
+	return product
+}
 func NewLexAnalysiser() *smn_analysis.StateMachine {
 	sm := new(smn_analysis.StateMachine).Init()
 	dft := smn_analysis.NewDftStateNodeReader(sm)
@@ -49,6 +69,9 @@ func NewLexAnalysiser() *smn_analysis.StateMachine {
 }
 func (this *IdentifierReader) onErr(inputs, reason string) error {
 	return fmt.Errorf(ErrTypeNotMatch, "IdentifierReader", inputs, reason)
+}
+func (this *IdentifierReader) Name() string {
+	return "IdentifierReader"
 }
 
 //only see if should stop read.
@@ -91,7 +114,7 @@ func (this *IdentifierReader) Clean() {
 }
 
 type PglaSpace struct {
-	Char rune
+	Char string
 }
 
 func (p *PglaSpace) ProductType() int {
@@ -100,6 +123,10 @@ func (p *PglaSpace) ProductType() int {
 
 type SpaceReader struct {
 	Result *PglaSpace
+}
+
+func (p *SpaceReader) Name() string {
+	return "SpaceReader"
 }
 
 //only see if should stop read.
@@ -115,7 +142,8 @@ func (p *SpaceReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analy
 //real read. even isEnd == true the input be readed.
 func (p *SpaceReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
 	char := read(input)
-	p.Result = &PglaSpace{Char: char}
+	charStr := string([]rune{char})
+	p.Result = &PglaSpace{Char: charStr}
 	return true, nil
 }
 
