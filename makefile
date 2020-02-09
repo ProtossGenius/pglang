@@ -1,10 +1,14 @@
-unit: FORCE
+unit: build
 	cd unit/ && go test -v -count=1
 
 import:
 	go get -u github.com/ProtossGenius/SureMoonNet
 
-FORCE:
+test: unit
 
-all: unit
+build:
+	go run ./build.go
+
+
+all: test 
 
