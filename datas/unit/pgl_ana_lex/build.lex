@@ -118,46 +118,9 @@ func writecv(str string) {
 	_, err := LexCfgVarsFile.WriteString(str)
 	check(err)
 }
-
 func writecvf(format string, a ...interface{}) {
 	writecv(fmt.Sprintf(format, a...))
 }
-
-func LexTypesCfg() {
-	fmt.Println("[start] read lex types config and write totcode")
-	defer fmt.Println("[start] read lex types config and write totcode")
-	writecv(`type PglaProduct int
-
-const (
-	PGLA_PRODUCT_ PglaProduct = iota
-	`)
-	datas, err := smn_file.FileReadAll("./datas/analysis/pgl_ana_lex/lextypes.cfg")
-	check(err)
-	constSet := map[string]bool{"": true}
-	constList := []string{}
-	for _, line := range strings.Split(string(datas), "\n") {
-		line = strings.Split(line, "#")[0]
-		line = strings.TrimSpace(line)
-		line = strings.ToUpper(line)
-		if constSet[line] {
-			continue
-		}
-		constList = append(constList, "PGLA_PRODUCT_"+line)
-		constSet[line] = true
-		writecvf("PGLA_PRODUCT_%s\n", line)
-	}
-	writecv(`
-)
-`)
-	writecv(`var PglaNameMap = map[PglaProduct]string{
-`)
-	for _, cst := range constList {
-		writecvf("%s:\"%s\",\n", cst, cst)
-	}
-	writecv(`}
-`)
-}
-
 func main() {
 	var err error
 	LexCfgVarsFile, err = smn_file.CreateNewFile("./analysis/pgl_ana_lex/cfg_vars.go")
@@ -167,6 +130,5 @@ func main() {
 	//read symbol list from file and write to code
 	SymbolVarCfg()
 	NumberVarCfg()
-	LexTypesCfg()
 	fmt.Println("SUCCESS")
 }

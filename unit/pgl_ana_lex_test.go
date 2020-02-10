@@ -94,6 +94,7 @@ func doCheck(t *testing.T) {
 		for i := 0; i < lenStd; i++ {
 			stdLp := stdOut[i]
 			unitLp := unitOut[i]
+			t.Logf("type: <%s>,  value :[%s]", pgl_ana_lex.PglaNameMap[stdLp.Type], stdLp.Value)
 			if stdLp.Type != unitLp.Type {
 				t.Fatalf("Error Type Not Equa. Index = %d, Std is %v, UnitOutput is %v ", i, stdLp, unitLp)
 			}

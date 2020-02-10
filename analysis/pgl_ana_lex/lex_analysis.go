@@ -9,13 +9,6 @@ import (
 )
 
 const (
-	PGLA_PRODUCT_ = iota
-	PGLA_PRODUCT_IDENT
-	PGLA_PRODUCT_SPACE
-	PGLA_PRODUCT_SYMBOL
-	PGLA_PRODUCT_COMMENT
-)
-const (
 	ErrTypeNotMatch = "ErrTypeNotMatch: AnalysisReader %s, input [%s], reason %s "
 )
 
@@ -24,12 +17,12 @@ type PglaInput struct {
 }
 
 type LexProduct struct {
-	Type  int    `json:"type"`
-	Value string `json:"value"`
+	Type  PglaProduct `json:"type"`
+	Value string      `json:"value"`
 }
 
 func (this *LexProduct) ProductType() int {
-	return this.Type
+	return int(this.Type)
 }
 
 func (p *PglaInput) Copy() smn_analysis.InputItf {
@@ -37,7 +30,7 @@ func (p *PglaInput) Copy() smn_analysis.InputItf {
 }
 
 func ToLexProduct(input smn_analysis.ProductItf) *LexProduct {
-	product := &LexProduct{Type: input.ProductType()}
+	product := &LexProduct{Type: PglaProduct(input.ProductType())}
 	switch product.Type {
 	case -1:
 		product.Value = "end"
@@ -65,6 +58,8 @@ func NewLexAnalysiser() *smn_analysis.StateMachine {
 	dft.Register(&SpaceReader{})
 	dft.Register(&SymbolReader{})
 	dft.Register(&CommentReader{})
+	dft.Register(&NumberReader{})
+	dft.Register(&StringReader{})
 	return sm
 }
 func (this *IdentifierReader) onErr(inputs, reason string) error {
@@ -260,4 +255,108 @@ func (c *CommentReader) GetProduct() smn_analysis.ProductItf {
 func (c *CommentReader) Clean() {
 	c.Result = ""
 	c.mutiLineCmt = false
+}
+
+//start with number.
+type NumberReader struct {
+	Result *LexProduct
+}
+
+//reader's name
+func (n *NumberReader) Name() string {
+	return "NumberReader"
+}
+
+func (this *NumberReader) onErr(inputs, reason string) error {
+	return fmt.Errorf(ErrTypeNotMatch, this.Name(), inputs, reason)
+}
+
+//only see if should stop read.
+func (n *NumberReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	char := read(input)
+	charStr := string([]rune{char})
+	nres := n.Result.Value + charStr
+	if n.Result.Value == "" {
+		if !unicode.IsDigit(char) {
+			return true, n.onErr(nres, "not start with number")
+		}
+	} else if !NumberCharSet[char] {
+		return true, nil
+	}
+	if char == '.' {
+		n.Result.Type = PGLA_PRODUCT_DECIMAL
+	}
+	return false, nil
+}
+
+//real read. even isEnd == true the input be readed.
+func (n *NumberReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	char := read(input)
+	charStr := string([]rune{char})
+	n.Result.Value += charStr
+	return false, nil
+}
+
+//return result
+func (n *NumberReader) GetProduct() smn_analysis.ProductItf {
+	return n.Result
+}
+
+//let the Reader like new.  it will be call before first Read
+func (n *NumberReader) Clean() {
+	n.Result = &LexProduct{Type: PGLA_PRODUCT_INTERGER}
+}
+
+type StringReader struct {
+	result string
+	escape bool
+}
+
+func (this *StringReader) onErr(inputs, reason string) error {
+	return fmt.Errorf(ErrTypeNotMatch, this.Name(), inputs, reason)
+}
+
+//reader's name
+func (s *StringReader) Name() string {
+	return "StringReader"
+}
+
+//only see if should stop read.
+func (s *StringReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	char := read(input)
+	charStr := string([]rune{char})
+	if s.result == "" {
+		if char != '"' && char != '`' && char != '\'' {
+			return true, s.onErr(charStr, "not a string")
+		}
+	}
+	return false, nil
+}
+
+//real read. even isEnd == true the input be readed.
+func (s *StringReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	char := read(input)
+	charStr := string([]rune{char})
+	s.result += charStr
+	resultRuneList := []rune(s.result)
+	if !s.escape && len(s.result) >= 2 && resultRuneList[0] == char {
+		return true, nil
+	}
+	if !s.escape && char == '\\' && resultRuneList[0] != '`' {
+		s.escape = true
+	} else {
+		s.escape = false
+	}
+	return false, nil
+}
+
+//return result
+func (s *StringReader) GetProduct() smn_analysis.ProductItf {
+	return &LexProduct{Type: PGLA_PRODUCT_STRING, Value: s.result}
+}
+
+//let the Reader like new.  it will be call before first Read
+func (s *StringReader) Clean() {
+	s.result = ""
+	s.escape = false
 }
