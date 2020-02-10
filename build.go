@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/ProtossGenius/SureMoonNet/basis/smn_file"
@@ -11,6 +12,24 @@ func check(err error) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+type RuneList []rune
+
+// Len is the number of elements in the collection.
+func (r RuneList) Len() int {
+	return len(r)
+}
+
+// Less reports whether the element with
+// index i should sort before the element with index j.
+func (r RuneList) Less(i int, j int) bool {
+	return r[i] < r[j]
+}
+
+// Swap swaps the elements with indexes i and j.
+func (r RuneList) Swap(i int, j int) {
+	r[i], r[j] = r[j], r[i]
 }
 
 func SymbolVarCfg() {
@@ -47,11 +66,15 @@ var SymbolList = map[string]bool{`)
 		}
 		writef("\"%s\":true,", line)
 	}
-
+	charList := make(RuneList, 0, len(charMap))
+	for char := range charMap {
+		charList = append(charList, char)
+	}
+	sort.Sort(charList)
 	write(`}
 
 var SymbolCharSet = map[rune]bool{`)
-	for char := range charMap {
+	for _, char := range charList {
 		if char == '\\' {
 			writef(`'\\':true,`)
 		} else {
