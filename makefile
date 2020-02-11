@@ -9,6 +9,7 @@ test: unit
 build:
 	go run ./build.go
 
+clean:
 
 all: test 
 
