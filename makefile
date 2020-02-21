@@ -3,6 +3,8 @@ unit: build
 
 import:
 	go get -u github.com/ProtossGenius/SureMoonNet
+	cd $(GOPATH)/src/github.com/ProtossGenius/SureMoonNet && make install
+
 
 test: unit
 
