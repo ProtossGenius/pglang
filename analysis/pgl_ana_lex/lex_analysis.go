@@ -60,6 +60,7 @@ func NewLexAnalysiser() *smn_analysis.StateMachine {
 	dft.Register(&CommentReader{})
 	dft.Register(&NumberReader{})
 	dft.Register(&StringReader{})
+	dft.Register(&HanReader{})
 	return sm
 }
 func (this *IdentifierReader) onErr(inputs, reason string) error {
