@@ -360,3 +360,44 @@ func (s *StringReader) Clean() {
 	s.result = ""
 	s.escape = false
 }
+
+type HanReader struct {
+	result *LexProduct
+}
+
+//reader's name
+func (h *HanReader) Name() string {
+	return "HanReader"
+}
+
+func (this *HanReader) onErr(inputs, reason string) error {
+	return fmt.Errorf(ErrTypeNotMatch, this.Name(), inputs, reason)
+}
+
+//only see if should stop read.
+func (h *HanReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	char := read(input)
+	charStr := string([]rune{char})
+	if !unicode.Is(unicode.Han, char) {
+		return true, h.onErr(charStr, "not han")
+	}
+	return false, nil
+}
+
+//real read. even isEnd == true the input be readed.
+func (h *HanReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	char := read(input)
+	charStr := string([]rune{char})
+	h.result = &LexProduct{Type: PGLA_PRODUCT_HAN, Value: charStr}
+	return true, nil
+}
+
+//return result
+func (h *HanReader) GetProduct() smn_analysis.ProductItf {
+	return h.result
+}
+
+//let the Reader like new.  it will be call before first Read
+func (h *HanReader) Clean() {
+	h.result = nil
+}
