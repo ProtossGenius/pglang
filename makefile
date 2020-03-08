@@ -10,6 +10,7 @@ test:  unit
 
 build: clean
 	go build ./build.go 
+	./build
 
 clean:
 	rm -f build
