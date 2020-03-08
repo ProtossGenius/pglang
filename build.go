@@ -16,6 +16,10 @@ func check(err error) {
 	}
 }
 
+var declaration = `//the file product by build.go  ProtossGenius whose email is guyvejianglou@outlook.com
+//you should never change this file.
+`
+
 type RuneList []rune
 
 // Len is the number of elements in the collection.
@@ -165,6 +169,7 @@ func main() {
 	check(err)
 	fmt.Println("$$$$$$$$$$$$$$$$$$$ start build project $$$$$$$$$$$$$$$$$$$$$")
 	//read symbol list from file and write to code
+	writecv(declaration)
 	SymbolVarCfg()
 	NumberVarCfg()
 	LexTypesCfg()

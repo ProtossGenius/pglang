@@ -76,6 +76,7 @@ func doCheck(t *testing.T) {
 		if info.IsDir() || !strings.HasSuffix(info.Name(), LEX_EXT) {
 			return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 		}
+		t.Logf("dealing sameple file .....         %s", path)
 		stdOut := []pgl_ana_lex.LexProduct{}
 		unitOut := []pgl_ana_lex.LexProduct{}
 		datas, err := smn_file.FileReadAll(path + LEX_O_STD)
@@ -94,7 +95,6 @@ func doCheck(t *testing.T) {
 		for i := 0; i < lenStd; i++ {
 			stdLp := stdOut[i]
 			unitLp := unitOut[i]
-			t.Logf("type: <%s>,  value :[%s]", pgl_ana_lex.PglaNameMap[stdLp.Type], stdLp.Value)
 			if stdLp.Type != unitLp.Type {
 				t.Fatalf("Error Type Not Equa. Index = %d, Std is %v, UnitOutput is %v ", i, stdLp, unitLp)
 			}
