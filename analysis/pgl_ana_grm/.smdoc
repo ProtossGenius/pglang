@@ -1,0 +1,12 @@
+//some about palang grammer
+
+oper + (lhs type, rhs type) (return type)
+
+oper = (lhs, rhs) (return)
+
+oper new (, rhs) (return)
+
+c = lhs+rhs+new()
+
+
+

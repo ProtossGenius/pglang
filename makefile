@@ -9,10 +9,9 @@ import:
 test:  unit
 
 build: clean
-	go build ./build.go 
-	./build
+	go run ./build.go 
 
 clean:
-	rm -f build
+
 all: test 
 

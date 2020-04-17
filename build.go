@@ -7,6 +7,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/ProtossGenius/SureMoonNet/basis/smn_exec"
 	"github.com/ProtossGenius/SureMoonNet/basis/smn_file"
 )
 
@@ -174,4 +175,5 @@ func main() {
 	NumberVarCfg()
 	LexTypesCfg()
 	fmt.Println("SUCCESS")
+	check(smn_exec.EasyDirExec("./", "gofmt", "-w", "./analysis/pgl_ana_lex/cfg_vars.go"))
 }
