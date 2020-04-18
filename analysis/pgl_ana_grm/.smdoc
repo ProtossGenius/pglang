@@ -1,12 +1,95 @@
 //some about palang grammer
-
+#Operator
+//define
 oper + (lhs type, rhs type) (return type)
+oper = (lhs type, rhs type) (return)
 
-oper = (lhs, rhs) (return)
+//useage 
 
-oper new (, rhs) (return)
+a = b + c
 
-c = lhs+rhs+new()
+//muti-value copy.  
+//will get there pointer if no same pointer at left and right will call copy-assignment for each var
+//if there are same. will copy its temp value replace the old right-value. 
+(a, b, c) = (d, e, a)
+//real run as  (a,b,c) = (d, e, temp:a) // will first calc right 
+
+#type 
+#class
+//type(class) define. 
+base(hello string)     //no base class
+type:base(a int, b int, c int) // have base class
+
+//member-function define.  if want set a default 5 can write as type.Func(a:int = 5) ~~~
+type.Func(a int)(err error){
+	err{Func.return(err)}
+//	err{__panic(err)} // append can use __nofunc to reset err's func.
+	err = err(aaa)
+	print(a)
+}
+
+//define type as function (when it change will call code-block which appened.)
+type{println("create ", __name(this))}
 
 
+int{println("int", this) // should not set base type as function. maybe should ban it, but this is a bug-oriented language.
+
+//__nofunc will remove type or values's function action. it returns param
+__nofunc(hello:type).{a=123}; //call built-in function. built-in function always startWith '__'
+
+// struct(object) init always use .{}  not forget the point, It let init difference from define.
+h:type.{123, 456, 789}  // set h.a = 123, h.b=456 ...
+H:type.{1, 2, ,3}
+// : and = all use for copy, but : is copy-create, and = is copy-assignment
+a_number:123
+h = H
+h.a = 15
+//reset value.
+h.{1, 2, 3}
+
+#oper-point .
+//ussally it find object's member. such as obj.mm
+//another: it can call any thing..
+a:12, b:13
+{ //rem: if no object before code-block, this code-block belong to current Scope
+	a = b; //right it will be run. real is .{a = b;}
+}
+
+c{ // if obj before code-block, code-block's Scope belong to object(it will find anything in obj first )
+	a = b  // no it can't be run. because it as value copy to c; a / b will get global. a/b's pos
+}
+
+c.{
+	a = b; //c.a = b. rem: if c don't have member 'a', compiler will give a's pos to the a in block. 
+	global.a = b; // can use global designated a from global, if code-block in function, can use function-name designated too.
+}
+//define a function Func
+Func(a:5, b:double){
+	a = b;
+}
+
+.Func //call Func, param will use default value, such as b = 0.0f
+.global //danger action. it will goto global.begin, and usually can't run as you want.
+
+#built-in function    __xxx
+//should put in builtin directory. builtin/hello is package hello.
+/*
+builtin	|
+		|a.pgl  // no package. you can use the function dirct.
+*/
+
+//compiler or interpreter should make sure the function effective.
+
+#interface.
+//because anything can be function
+
+Itf(a(prm_a...)(ret_a...), b(prm_b...)(res_b...))
+
+//it's achieve 
+
+Ach:Itf(mem:int).{
+	a{ something... }
+	b{ something...}
+	mem = 12
+}
 
