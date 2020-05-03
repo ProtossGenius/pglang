@@ -17,10 +17,11 @@ func check(err error) {
 	}
 }
 
-var declaration = `//the file product by build.go  ProtossGenius whose email is guyvejianglou@outlook.com
+const declaration = `//the file product by build.go  ProtossGenius whose email is guyvejianglou@outlook.com
 //you should never change this file.
 `
 
+//RuneList rune-array for sort.
 type RuneList []rune
 
 // Len is the number of elements in the collection.
@@ -41,46 +42,55 @@ func (r RuneList) Swap(i int, j int) {
 
 var LexCfgVarsFile *os.File
 
+//SymbolVarCfg write symbol-var-cfg to file.
 func SymbolVarCfg() {
 	fmt.Println("[start]read symbol list from file and write to code")
 	defer fmt.Println("[end]read symbol list from file and write to code")
 
+	charMap := map[rune]bool{}
 	datas, err := smn_file.FileReadAll("./datas/analysis/pgl_ana_lex/symbol.cfg")
 	check(err)
-	charMap := map[rune]bool{}
 	writecv(`package pgl_ana_lex
 
 var SymbolList = map[string]bool{`)
+
 	smbList := strings.Split(string(datas), "\n")
 	for i := range smbList {
 		smbList[i] = strings.TrimSpace(smbList[i])
 		smbList[i] = strings.Replace(smbList[i], "\\", "\\\\", -1)
 		line := smbList[i]
+
 		if line == "" {
 			continue
 		}
+
 		for _, char := range line {
 			charMap[char] = true
 		}
+
 		writecvf("\"%s\":true,", line)
 	}
+
 	charList := make(RuneList, 0, len(charMap))
 	for char := range charMap {
 		charList = append(charList, char)
 	}
+
 	sort.Sort(charList)
 	writecv(`}
 
 var SymbolCharSet = map[rune]bool{`)
+
 	for _, char := range charList {
 		if char == '\\' {
 			writecvf(`'\\':true,`)
 		} else {
 			writecvf("'%c':true,", char)
 		}
-
 	}
+
 	ccMap := map[string]bool{"": true}
+
 	writecv(`}
 
 var SymbolCanContinue = map[string]bool{`)
@@ -90,32 +100,41 @@ var SymbolCanContinue = map[string]bool{`)
 			if ccMap[c2] || c1 == c2 {
 				continue
 			}
+
 			if strings.HasPrefix(c1, c2) {
 				writecvf("\"%s\":true, ", c2)
+
 				ccMap[c2] = true
 			}
 		}
 	}
+
 	writecv(`}
 
 //some maybe define in another type, but not as symbol. like comment's "//" and "/*"
 var SymbolUnuse = map[string]bool{"//":true, "/*":true}
 `)
 }
+
+//NumberVarCfg write to file.
 func NumberVarCfg() {
 	fmt.Println("[start]read Number Charset and write to code ")
-	defer fmt.Println("[start]read Number Charset and write to code ")
+	defer fmt.Println("[end]read Number Charset and write to code ")
+
 	datas, err := smn_file.FileReadAll("./datas/analysis/pgl_ana_lex/number.cfg")
 	check(err)
 	writecv(`
 //number charSet
 var NumberCharSet = map[rune]bool{`)
+
 	for _, char := range string(datas) {
 		if unicode.IsSpace(char) {
 			continue
 		}
+
 		writecvf(`'%c':true, `, char)
 	}
+
 	writecv(`}
 `)
 }
@@ -128,37 +147,47 @@ func writecvf(format string, a ...interface{}) {
 	writecv(fmt.Sprintf(format, a...))
 }
 
+//LexTypesCfg write to file.
 func LexTypesCfg() {
 	fmt.Println("[start] read lex types config and write totcode")
-	defer fmt.Println("[start] read lex types config and write totcode")
+	defer fmt.Println("[end] read lex types config and write totcode")
 	writecv(`type PglaProduct int
 
 const (
 	PGLA_PRODUCT_ PglaProduct = iota
 	`)
+
 	datas, err := smn_file.FileReadAll("./datas/analysis/pgl_ana_lex/lextypes.cfg")
 	check(err)
+
 	constSet := map[string]bool{"": true}
 	constList := []string{}
+
 	for _, line := range strings.Split(string(datas), "\n") {
 		line = strings.Split(line, "#")[0]
 		line = strings.TrimSpace(line)
 		line = strings.ToUpper(line)
+
 		if constSet[line] {
 			continue
 		}
+
 		constList = append(constList, "PGLA_PRODUCT_"+line)
 		constSet[line] = true
+
 		writecvf("PGLA_PRODUCT_%s\n", line)
 	}
+
 	writecv(`
 )
 `)
 	writecv(`var PglaNameMap = map[PglaProduct]string{
 `)
+
 	for _, cst := range constList {
 		writecvf("%s:\"%s\",\n", cst, cst)
 	}
+
 	writecv(`}
 `)
 }
@@ -166,8 +195,9 @@ const (
 func main() {
 	var err error
 	LexCfgVarsFile, err = smn_file.CreateNewFile("./analysis/pgl_ana_lex/cfg_vars.go")
-	defer LexCfgVarsFile.Close()
 	check(err)
+
+	defer LexCfgVarsFile.Close()
 	fmt.Println("$$$$$$$$$$$$$$$$$$$ start build project $$$$$$$$$$$$$$$$$$$$$")
 	//read symbol list from file and write to code
 	writecv(declaration)
