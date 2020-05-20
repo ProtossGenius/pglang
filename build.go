@@ -48,9 +48,9 @@ func SymbolVarCfg() {
 	defer fmt.Println("[end]read symbol list from file and write to code")
 
 	charMap := map[rune]bool{}
-	datas, err := smn_file.FileReadAll("./datas/analysis/pgl_ana_lex/symbol.cfg")
+	datas, err := smn_file.FileReadAll("./datas/analysis/lex_pgl/symbol.cfg")
 	check(err)
-	writecv(`package pgl_ana_lex
+	writecv(`package lex_pgl
 
 var SymbolList = map[string]bool{`)
 
@@ -121,7 +121,7 @@ func NumberVarCfg() {
 	fmt.Println("[start]read Number Charset and write to code ")
 	defer fmt.Println("[end]read Number Charset and write to code ")
 
-	datas, err := smn_file.FileReadAll("./datas/analysis/pgl_ana_lex/number.cfg")
+	datas, err := smn_file.FileReadAll("./datas/analysis/lex_pgl/number.cfg")
 	check(err)
 	writecv(`
 //number charSet
@@ -157,7 +157,7 @@ const (
 	PGLA_PRODUCT_ PglaProduct = iota
 	`)
 
-	datas, err := smn_file.FileReadAll("./datas/analysis/pgl_ana_lex/lextypes.cfg")
+	datas, err := smn_file.FileReadAll("./datas/analysis/lex_pgl/lextypes.cfg")
 	check(err)
 
 	constSet := map[string]bool{"": true}
@@ -194,7 +194,7 @@ const (
 
 func main() {
 	var err error
-	LexCfgVarsFile, err = smn_file.CreateNewFile("./analysis/pgl_ana_lex/cfg_vars.go")
+	LexCfgVarsFile, err = smn_file.CreateNewFile("./analysis/lex_pgl/cfg_vars.go")
 	check(err)
 
 	defer LexCfgVarsFile.Close()
@@ -205,5 +205,5 @@ func main() {
 	NumberVarCfg()
 	LexTypesCfg()
 	fmt.Println("SUCCESS")
-	check(smn_exec.EasyDirExec("./", "gofmt", "-w", "./analysis/pgl_ana_lex/cfg_vars.go"))
+	check(smn_exec.EasyDirExec("./", "gofmt", "-w", "./analysis/lex_pgl/cfg_vars.go"))
 }

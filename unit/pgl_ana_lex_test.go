@@ -8,14 +8,14 @@ import (
 	"github.com/ProtossGenius/SureMoonNet/basis/smn_analysis"
 	"github.com/ProtossGenius/SureMoonNet/basis/smn_data"
 	"github.com/ProtossGenius/SureMoonNet/basis/smn_file"
-	"github.com/ProtossGenius/pglang/analysis/pgl_ana_lex"
+	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 	jsoniter "github.com/json-iterator/go"
 )
 
-func analysis(str string) ([]*pgl_ana_lex.LexProduct, error) {
-	sm := pgl_ana_lex.NewLexAnalysiser()
+func analysis(str string) ([]*lex_pgl.LexProduct, error) {
+	sm := lex_pgl.NewLexAnalysiser()
 	for _, char := range str {
-		err := sm.Read(&pgl_ana_lex.PglaInput{Char: char})
+		err := sm.Read(&lex_pgl.PglaInput{Char: char})
 		if err != nil {
 			return nil, err
 		}
@@ -26,9 +26,9 @@ func analysis(str string) ([]*pgl_ana_lex.LexProduct, error) {
 	for len(rc) != 0 {
 		res = append(res, <-rc)
 	}
-	arr := []*pgl_ana_lex.LexProduct{}
+	arr := []*lex_pgl.LexProduct{}
 	for _, p := range res {
-		pro := pgl_ana_lex.ToLexProduct(p)
+		pro := lex_pgl.ToLexProduct(p)
 		arr = append(arr, pro)
 
 	}
@@ -36,7 +36,7 @@ func analysis(str string) ([]*pgl_ana_lex.LexProduct, error) {
 }
 
 const (
-	LEX_PATH   = "../datas/unit/pgl_ana_lex"
+	LEX_PATH   = "../datas/unit/lex_pgl"
 	LEX_EXT    = ".lex"
 	LEX_O_UNIT = ".to"
 	LEX_O_STD  = ".std"
@@ -77,8 +77,8 @@ func doCheck(t *testing.T) {
 			return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 		}
 		t.Logf("dealing sameple file .....         %s", path)
-		stdOut := []pgl_ana_lex.LexProduct{}
-		unitOut := []pgl_ana_lex.LexProduct{}
+		stdOut := []lex_pgl.LexProduct{}
+		unitOut := []lex_pgl.LexProduct{}
 		datas, err := smn_file.FileReadAll(path + LEX_O_STD)
 		check(err)
 		err = jsoniter.Unmarshal(datas, &stdOut)

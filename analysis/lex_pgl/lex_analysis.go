@@ -1,4 +1,4 @@
-package pgl_ana_lex
+package lex_pgl
 
 import (
 	"fmt"

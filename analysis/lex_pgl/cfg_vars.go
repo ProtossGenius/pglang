@@ -1,6 +1,6 @@
 //the file product by build.go  ProtossGenius whose email is guyvejianglou@outlook.com
 //you should never change this file.
-package pgl_ana_lex
+package lex_pgl
 
 var SymbolList = map[string]bool{"+": true, "-": true, "*": true, "/": true, "%": true, "!": true, "^": true, "|": true, "||": true, "&": true, "&&": true, "?": true, "~": true, "(": true, ")": true, "=": true, "[": true, "]": true, "{": true, "}": true, "==": true, "+=": true, "-=": true, "*=": true, "/=": true, "!=": true, "|=": true, "&=": true, "^=": true, "%=": true, "~=": true, ",": true, ".": true, ";": true, "$": true, "@": true, "#": true, "\\": true, ":": true, ">": true, "<": true, ">=": true, "<=": true, ">>": true, "<<": true}
 
