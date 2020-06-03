@@ -21,8 +21,12 @@ type LexProduct struct {
 	Value string      `json:"value"`
 }
 
-func (this *LexProduct) ProductType() int {
-	return int(this.Type)
+func (l *LexProduct) Copy() smn_analysis.InputItf {
+	return &LexProduct{Type: l.Type, Value: l.Value}
+}
+
+func (l *LexProduct) ProductType() int {
+	return int(l.Type)
 }
 
 func (p *PglaInput) Copy() smn_analysis.InputItf {

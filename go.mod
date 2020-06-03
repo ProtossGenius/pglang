@@ -3,8 +3,7 @@ module github.com/ProtossGenius/pglang
 go 1.14
 
 require (
-	github.com/ProtossGenius/SureMoonNet v0.0.0-20200306105359-daa6b42af4ea
-	github.com/ProtossGenius/smofa v0.0.0-20200113085031-717371f2b397 // indirect
+	github.com/ProtossGenius/SureMoonNet v0.0.0-20200521032145-0c59772c4523
 	github.com/json-iterator/go v1.1.9
 	github.com/klauspost/cpuid v1.2.3 // indirect
 	github.com/klauspost/reedsolomon v1.9.4 // indirect
