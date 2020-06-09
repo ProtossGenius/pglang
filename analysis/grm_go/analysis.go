@@ -10,12 +10,12 @@ import (
 const (
 	//GrammarPackage package ...
 	GrammarPackage = iota
-	//GrammarList list when deal type(...) etc..
-	GrammarList
 	//GrammarTypeStruct struct.
 	GrammarTypeStruct
 	//GrammarTypeFunc type a func ..
 	GrammarTypeFunc
+	//GrammarTypeItf interface.
+	GrammarTypeItf
 	//GrammarFunc func.
 	GrammarFunc
 	//GrammarVar var.
@@ -29,9 +29,25 @@ const (
 	ErrTypeNotMatch = "ErrTypeNotMatch: AnalysisReader %s, inputType [%s], inputValue[%s], reason %s "
 )
 
+func read(input smn_analysis.InputItf) *lex_pgl.LexProduct {
+	return input.(*lex_pgl.LexProduct)
+}
+
+func isIdent(input *lex_pgl.LexProduct) bool {
+	return input.Type == lex_pgl.PGLA_PRODUCT_IDENT
+}
+
+func isSpace(lex *lex_pgl.LexProduct) bool {
+	return lex.Type == lex_pgl.PGLA_PRODUCT_SPACE
+}
+
+func onErr(p smn_analysis.StateNodeReader, input *lex_pgl.LexProduct, reason string) error {
+	return fmt.Errorf(ErrTypeNotMatch, p.Name(), lex_pgl.PglaNameMap[input.Type], input.Value, reason)
+}
+
 //GrmGoPackage grammar product go package.
 type GrmGoPackage struct {
-	Name string
+	Name string `json:"name"`
 }
 
 //ProductType .
@@ -45,17 +61,9 @@ type PackageReader struct {
 	result *GrmGoPackage
 }
 
-func read(input smn_analysis.InputItf) *lex_pgl.LexProduct {
-	return input.Copy().(*lex_pgl.LexProduct)
-}
-
 //Name reader's name.
 func (p *PackageReader) Name() string {
 	return "PackageReader"
-}
-
-func (p *PackageReader) onErr(input *lex_pgl.LexProduct, reason string) error {
-	return fmt.Errorf(ErrTypeNotMatch, p.Name(), lex_pgl.PglaNameMap[input.Type], input.Value, reason)
 }
 
 //PreRead only see if should stop read.
@@ -63,14 +71,14 @@ func (p *PackageReader) PreRead(stateNode *smn_analysis.StateNode,
 	input smn_analysis.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 	if p.first && lex.Value != "package" {
-		return false, p.onErr(lex, "first input should be [package]")
+		return true, onErr(p, lex, "first input should be [package]")
 	}
 
-	if !p.first && lex.Type != lex_pgl.PGLA_PRODUCT_IDENT {
-		return false, p.onErr(lex, "second input should be indent")
+	if !p.first && !(isIdent(lex) || isSpace(lex)) {
+		return true, onErr(p, lex, "second input should be indent or space")
 	}
 
-	return true, nil
+	return false, nil
 }
 
 //Read real read. even isEnd == true the input be readed.
@@ -78,7 +86,7 @@ func (p *PackageReader) Read(stateNode *smn_analysis.StateNode, input smn_analys
 	lex := read(input)
 	if p.first && lex.Value == "package" {
 		p.first = false
-		return true, nil
+		return false, nil
 	}
 
 	p.result.Name = lex.Value

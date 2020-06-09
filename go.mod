@@ -3,7 +3,9 @@ module github.com/ProtossGenius/pglang
 go 1.14
 
 require (
-	github.com/ProtossGenius/SureMoonNet v0.0.0-20200521032145-0c59772c4523
+	github.com/ProtossGenius/SureMoonNet v0.0.0-20200529112350-db0971c5a40d
+	github.com/ProtossGenius/smn-cpp v0.0.0-20200605081320-4de0f87e059d // indirect
+	github.com/ProtossGenius/srfile v0.0.0-20200601032907-0258f7e1b3ac // indirect
 	github.com/json-iterator/go v1.1.9
 	github.com/klauspost/cpuid v1.2.3 // indirect
 	github.com/klauspost/reedsolomon v1.9.4 // indirect
@@ -14,7 +16,3 @@ require (
 	golang.org/x/crypto v0.0.0-20200423211502-4bdfaf469ed5 // indirect
 	golang.org/x/net v0.0.0-20200421231249-e086a090c8fd // indirect
 )
-
-replace github.com/ProtossGenius/SureMoonNet => /data/workspace/go/src/github.com/ProtossGenius/SureMoonNet
-
-replace github.com/ProtossGenius/smntools => /data/workspace/go/src/github.com/ProtossGenius/smntools

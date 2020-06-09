@@ -14,32 +14,41 @@ import (
 
 func analysis(str string) ([]*lex_pgl.LexProduct, error) {
 	sm := lex_pgl.NewLexAnalysiser()
+
 	for _, char := range str {
 		err := sm.Read(&lex_pgl.PglaInput{Char: char})
 		if err != nil {
 			return nil, err
 		}
 	}
+
 	sm.End()
 	rc := sm.GetResultChan()
 	res := make([]smn_analysis.ProductItf, 0, len(rc))
+
 	for len(rc) != 0 {
 		res = append(res, <-rc)
 	}
+
 	arr := []*lex_pgl.LexProduct{}
+
 	for _, p := range res {
 		pro := lex_pgl.ToLexProduct(p)
 		arr = append(arr, pro)
-
 	}
+
 	return arr, nil
 }
 
 const (
-	LEX_PATH   = "../datas/unit/lex_pgl"
-	LEX_EXT    = ".lex"
-	LEX_O_UNIT = ".to"
-	LEX_O_STD  = ".std"
+	//LexPath lex-analysis unit test file path.
+	LexPath = "../datas/unit/lex_pgl"
+	//LexExt lex-analysis unit test file's extension name.
+	LexExt = ".lex"
+	//LexOUnit lex-analysis unit test's output.
+	LexOUnit = ".to"
+	//LexOStd lex-analysis unite test's std-output(for compare with current output.).
+	LexOStd = ".std"
 )
 
 func lexWrite(t *testing.T, ext string) {
@@ -48,8 +57,8 @@ func lexWrite(t *testing.T, ext string) {
 			t.Fatal(err)
 		}
 	}
-	_, err := smn_file.DeepTraversalDir(LEX_PATH, func(path string, info os.FileInfo) smn_file.FileDoFuncResult {
-		if info.IsDir() || !strings.HasSuffix(info.Name(), LEX_EXT) {
+	_, err := smn_file.DeepTraversalDir(LexPath, func(path string, info os.FileInfo) smn_file.FileDoFuncResult {
+		if info.IsDir() || !strings.HasSuffix(info.Name(), LexExt) {
 			return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 		}
 		datas, err := smn_file.FileReadAll(path)
@@ -72,18 +81,18 @@ func doCheck(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	_, err := smn_file.DeepTraversalDir(LEX_PATH, func(path string, info os.FileInfo) smn_file.FileDoFuncResult {
-		if info.IsDir() || !strings.HasSuffix(info.Name(), LEX_EXT) {
+	_, err := smn_file.DeepTraversalDir(LexPath, func(path string, info os.FileInfo) smn_file.FileDoFuncResult {
+		if info.IsDir() || !strings.HasSuffix(info.Name(), LexExt) {
 			return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 		}
 		t.Logf("dealing sameple file .....         %s", path)
 		stdOut := []lex_pgl.LexProduct{}
 		unitOut := []lex_pgl.LexProduct{}
-		datas, err := smn_file.FileReadAll(path + LEX_O_STD)
+		datas, err := smn_file.FileReadAll(path + LexOStd)
 		check(err)
 		err = jsoniter.Unmarshal(datas, &stdOut)
 		check(err)
-		datas, err = smn_file.FileReadAll(path + LEX_O_UNIT)
+		datas, err = smn_file.FileReadAll(path + LexOUnit)
 		check(err)
 		err = jsoniter.Unmarshal(datas, &unitOut)
 		check(err)
@@ -105,7 +114,6 @@ func doCheck(t *testing.T) {
 }
 
 func TestAnalysis(t *testing.T) {
-	lexWrite(t, LEX_O_UNIT)
+	lexWrite(t, LexOUnit)
 	doCheck(t)
-	//TODO : input && output should read from file.
 }
