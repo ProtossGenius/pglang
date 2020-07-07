@@ -65,6 +65,7 @@ func NewLexAnalysiser() *smn_analysis.StateMachine {
 	dft.Register(&NumberReader{})
 	dft.Register(&StringReader{})
 	dft.Register(&HanReader{})
+	dft.Register(&PathSplitReader{})
 	return sm
 }
 func (this *IdentifierReader) onErr(inputs, reason string) error {
@@ -405,4 +406,54 @@ func (h *HanReader) GetProduct() smn_analysis.ProductItf {
 //let the Reader like new.  it will be call before first Read
 func (h *HanReader) Clean() {
 	h.result = nil
+}
+
+func onErr(s smn_analysis.StateNodeReader, inputs, reason string) error {
+	return fmt.Errorf(ErrTypeNotMatch, s.Name(), inputs, reason)
+}
+
+type PathSplitReader struct {
+	first bool
+}
+
+//Name reader's name.
+func (p *PathSplitReader) Name() string {
+	return "PathSplitReader"
+}
+
+//PreRead only see if should stop read.
+func (p *PathSplitReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	char := read(input)
+	charStr := string([]rune{char})
+	if p.first {
+		if char != '/' {
+			return true, onErr(p, charStr, "not a PathSplit [/]")
+		}
+
+		return false, nil
+	}
+	//second char.
+	if char == '/' || char == '*' {
+		return true, onErr(p, charStr, "seems like a comment.")
+	}
+
+	fmt.Println("is a PathSplit ..................")
+	return true, nil
+}
+
+//Read real read. even isEnd == true the input be readed.
+func (p *PathSplitReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ")
+	p.first = false
+	return false, nil
+}
+
+//GetProduct return result.
+func (p *PathSplitReader) GetProduct() smn_analysis.ProductItf {
+	return &LexProduct{Type: PGLA_PRODUCT_IDENT, Value: "/"}
+}
+
+//Clean let the Reader like new.  it will be call before first Read.
+func (p *PathSplitReader) Clean() {
+	p.first = true
 }

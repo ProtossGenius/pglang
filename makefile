@@ -14,4 +14,4 @@ build: clean
 clean:
 
 all: test 
-
+install:
