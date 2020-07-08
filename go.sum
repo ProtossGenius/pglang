@@ -2,8 +2,13 @@ cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMT
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/ProtossGenius/SureMoonNet v0.0.0-20200306105359-daa6b42af4ea/go.mod h1:DexIz9X8JQLADYOefbi4niOFuCMG8JiRfVDgy0Qn7EQ=
 github.com/ProtossGenius/SureMoonNet v0.0.0-20200521032145-0c59772c4523/go.mod h1:JRRabxqHGMICLX6KXhzIChSlNe9VF5QApcU9NJRBTxU=
+github.com/ProtossGenius/SureMoonNet v0.0.0-20200529112350-db0971c5a40d/go.mod h1:iiVYhK9bisfhTvxnyirXSOEjO6kxxryYdM8SY33kcno=
 github.com/ProtossGenius/SureMoonNet v0.0.0-20200605062244-c6b4fa09239d h1:IzGR0FJp7tlxDlX7HCre3vpji1lQLWmqFPruJRRYm74=
 github.com/ProtossGenius/SureMoonNet v0.0.0-20200605062244-c6b4fa09239d/go.mod h1:iiVYhK9bisfhTvxnyirXSOEjO6kxxryYdM8SY33kcno=
+github.com/ProtossGenius/SureMoonNet v0.0.0-20200707073838-c1fa57eefc34 h1:q1+SB3vTKu0S9EJopVF++j3InDcXemfhL2qEgUi03C0=
+github.com/ProtossGenius/SureMoonNet v0.0.0-20200707073838-c1fa57eefc34/go.mod h1:u6sNdsRmfNr+Je5k/zW1A/0VI7/LwiILHm0329pnbX4=
+github.com/ProtossGenius/SureMoonNet v0.0.0-20200708073246-14e2b3e5eafa h1:gR0hiGbRTqLEQWuzlb4rNmBOLHZWLYwpscnhJZNKxYM=
+github.com/ProtossGenius/SureMoonNet v0.0.0-20200708073246-14e2b3e5eafa/go.mod h1:s1hd2vVAEaFnZ1CnJvh9kVkqvfmT2emDYSI/hzaX+Oo=
 github.com/ProtossGenius/smn-cpp v0.0.0-20200605081320-4de0f87e059d/go.mod h1:LoCLyGaS0GC9cOD5dcBV1ULkRHF5txwVUg4eepcxgeg=
 github.com/ProtossGenius/smntools v0.0.0-20200520072714-534c87925479/go.mod h1:hUUzj3mblHxQNz1sNTi9k1ZbCRQbbGh6c170tVTrHbM=
 github.com/ProtossGenius/smntools v0.0.0-20200529112536-ce620f794186/go.mod h1:5XP6xb/nndSUIuO0zMtytzmk/vEwzF0obcBDuyh3OFs=
