@@ -1,15 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/ProtossGenius/SureMoonNet/basis/smn_analysis"
-	"github.com/ProtossGenius/SureMoonNet/basis/smn_data"
 	"github.com/ProtossGenius/SureMoonNet/basis/smn_file"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
-	jsoniter "github.com/json-iterator/go"
 )
 
 func analysis(str string) ([]*lex_pgl.LexProduct, error) {
@@ -65,14 +64,33 @@ func lexWrite(t *testing.T, ext string) {
 		check(err)
 		pro, err := analysis(string(datas))
 		check(err)
-		jstr, err := smn_data.ValToJson(pro)
-		check(err)
-		f, err := smn_file.CreateNewFile(path + ext)
-		check(err)
-		f.WriteString(jstr)
+		writeLexProduct(t, path+ext, pro)
 		return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 	})
 	check(err)
+}
+
+func strDeal(str string) string {
+	str = strings.ReplaceAll(str, "\\", "\\\\")
+	return strings.ReplaceAll(str, "\n", "\\n")
+}
+
+func writeLexProduct(t *testing.T, path string, list []*lex_pgl.LexProduct) {
+	check := func(err error) {
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	f, err := smn_file.CreateNewFile(path)
+	check(err)
+
+	defer f.Close()
+
+	for _, lp := range list {
+		_, err = f.WriteString(fmt.Sprintf("%s %s\n", lex_pgl.PglaNameMap[lp.Type], strDeal(lp.Value)))
+		check(err)
+	}
 }
 
 func doCheck(t *testing.T) {
@@ -86,27 +104,12 @@ func doCheck(t *testing.T) {
 			return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 		}
 		t.Logf("dealing sameple file .....         %s", path)
-		stdOut := []lex_pgl.LexProduct{}
-		unitOut := []lex_pgl.LexProduct{}
-		datas, err := smn_file.FileReadAll(path + LexOStd)
+		dStd, err := smn_file.FileReadAll(path + LexOStd)
 		check(err)
-		err = jsoniter.Unmarshal(datas, &stdOut)
+		dUnit, err := smn_file.FileReadAll(path + LexOUnit)
 		check(err)
-		datas, err = smn_file.FileReadAll(path + LexOUnit)
-		check(err)
-		err = jsoniter.Unmarshal(datas, &unitOut)
-		check(err)
-		lenStd := len(stdOut)
-		lenUnit := len(unitOut)
-		if lenStd != lenUnit {
-			t.Fatal("Error output len not equal, lex file path = ", path)
-		}
-		for i := 0; i < lenStd; i++ {
-			stdLp := stdOut[i]
-			unitLp := unitOut[i]
-			if stdLp.Type != unitLp.Type {
-				t.Fatalf("Error Type Not Equa. Index = %d, Std is %v, UnitOutput is %v ", i, stdLp, unitLp)
-			}
+		if string(dStd) != string(dUnit) {
+			t.Fatalf("Error Result Not Equa.")
 		}
 		return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 	})

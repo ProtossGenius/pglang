@@ -46,6 +46,7 @@ func DeleteComment(src string) (string, error) {
 
 		if lp.ProductType() != int(lex_pgl.PGLA_PRODUCT_COMMENT) {
 			lexP := lex_pgl.ToLexProduct(lp)
+			fmt.Println(lexP.ProductType(), lexP.Value)
 			strArr = append(strArr, lexP.Value)
 		}
 	}
@@ -54,5 +55,10 @@ func DeleteComment(src string) (string, error) {
 }
 
 func main() {
-	fmt.Println(DeleteComment("#include<google/hello>"))
+	fmt.Println(DeleteComment(`#include<google/hello>
+	int main()
+	{//hehehhe
+	/*aaaa*/
+	}a 
+/`))
 }

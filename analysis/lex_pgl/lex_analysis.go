@@ -36,11 +36,14 @@ func (p *PglaInput) Copy() smn_analysis.InputItf {
 func ToLexProduct(input smn_analysis.ProductItf) *LexProduct {
 	product := &LexProduct{Type: PglaProduct(input.ProductType())}
 	switch product.Type {
-	case -1:
+	case smn_analysis.ResultEnd:
 		product.Value = "end"
 		return product
-	case -2:
+	case smn_analysis.ResultPFromDft:
 		product.Value = input.(*smn_analysis.ProductDftNode).Reason
+		return product
+	case smn_analysis.ResultError:
+		product.Value = input.(*smn_analysis.ProductError).Err
 		return product
 	}
 	return input.(*LexProduct)
@@ -65,7 +68,6 @@ func NewLexAnalysiser() *smn_analysis.StateMachine {
 	dft.Register(&NumberReader{})
 	dft.Register(&StringReader{})
 	dft.Register(&HanReader{})
-	dft.Register(&PathSplitReader{})
 	return sm
 }
 func (this *IdentifierReader) onErr(inputs, reason string) error {
@@ -103,6 +105,10 @@ func (this *IdentifierReader) Read(stateNode *smn_analysis.StateNode, input smn_
 	return false, nil
 }
 
+func (this *IdentifierReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
+	return true, nil
+}
+
 //return result
 func (this *IdentifierReader) GetProduct() smn_analysis.ProductItf {
 	return this.result
@@ -137,6 +143,10 @@ func (p *SpaceReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis
 	char := read(input)
 	charStr := string([]rune{char})
 	p.Result = &LexProduct{Type: PGLA_PRODUCT_SPACE, Value: charStr}
+	return true, nil
+}
+
+func (p *SpaceReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
 	return true, nil
 }
 
@@ -192,6 +202,9 @@ func (s *SymbolReader) Read(stateNode *smn_analysis.StateNode, input smn_analysi
 	charStr := string([]rune{char})
 	s.Result += charStr
 	return false, nil
+}
+func (s *SymbolReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
+	return true, nil
 }
 
 //return result
@@ -252,6 +265,14 @@ func (c *CommentReader) Read(stateNode *smn_analysis.StateNode, input smn_analys
 	return false, nil
 }
 
+func (c *CommentReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
+	if strings.HasPrefix(c.Result, "//") {
+		return true, nil
+	}
+
+	return true, c.onErr("EOF", "unexpect EOF.")
+}
+
 //return result
 func (c *CommentReader) GetProduct() smn_analysis.ProductItf {
 	return &LexProduct{Type: PGLA_PRODUCT_COMMENT, Value: c.Result}
@@ -301,6 +322,10 @@ func (n *NumberReader) Read(stateNode *smn_analysis.StateNode, input smn_analysi
 	charStr := string([]rune{char})
 	n.Result.Value += charStr
 	return false, nil
+}
+
+func (n *NumberReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+	return true, nil
 }
 
 //return result
@@ -356,6 +381,10 @@ func (s *StringReader) Read(stateNode *smn_analysis.StateNode, input smn_analysi
 	return false, nil
 }
 
+func (s *StringReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+	return true, s.onErr("EOF", "undexcept EOF")
+}
+
 //return result
 func (s *StringReader) GetProduct() smn_analysis.ProductItf {
 	return &LexProduct{Type: PGLA_PRODUCT_STRING, Value: s.result}
@@ -398,6 +427,10 @@ func (h *HanReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.I
 	return true, nil
 }
 
+func (h *HanReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+	return true, nil
+}
+
 //return result
 func (h *HanReader) GetProduct() smn_analysis.ProductItf {
 	return h.result
@@ -410,50 +443,4 @@ func (h *HanReader) Clean() {
 
 func onErr(s smn_analysis.StateNodeReader, inputs, reason string) error {
 	return fmt.Errorf(ErrTypeNotMatch, s.Name(), inputs, reason)
-}
-
-type PathSplitReader struct {
-	first bool
-}
-
-//Name reader's name.
-func (p *PathSplitReader) Name() string {
-	return "PathSplitReader"
-}
-
-//PreRead only see if should stop read.
-func (p *PathSplitReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
-	char := read(input)
-	charStr := string([]rune{char})
-	if p.first {
-		if char != '/' {
-			return true, onErr(p, charStr, "not a PathSplit [/]")
-		}
-
-		return false, nil
-	}
-	//second char.
-	if char == '/' || char == '*' {
-		return true, onErr(p, charStr, "seems like a comment.")
-	}
-
-	fmt.Println("is a PathSplit ..................")
-	return true, nil
-}
-
-//Read real read. even isEnd == true the input be readed.
-func (p *PathSplitReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
-	fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ")
-	p.first = false
-	return false, nil
-}
-
-//GetProduct return result.
-func (p *PathSplitReader) GetProduct() smn_analysis.ProductItf {
-	return &LexProduct{Type: PGLA_PRODUCT_IDENT, Value: "/"}
-}
-
-//Clean let the Reader like new.  it will be call before first Read.
-func (p *PathSplitReader) Clean() {
-	p.first = true
 }

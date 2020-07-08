@@ -1,1 +1,993 @@
-[{"type":1,"value":"package"},{"type":2,"value":" "},{"type":1,"value":"main"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":1,"value":"import"},{"type":2,"value":" "},{"type":3,"value":"("},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":7,"value":"\"fmt\""},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":7,"value":"\"os\""},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":7,"value":"\"sort\""},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":7,"value":"\"strings\""},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":7,"value":"\"unicode\""},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":7,"value":"\"github.com/ProtossGenius/SureMoonNet/basis/smn_file\""},{"type":2,"value":"\n"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":1,"value":"func"},{"type":2,"value":" "},{"type":1,"value":"check"},{"type":3,"value":"("},{"type":1,"value":"err"},{"type":2,"value":" "},{"type":1,"value":"error"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"if"},{"type":2,"value":" "},{"type":1,"value":"err"},{"type":2,"value":" "},{"type":3,"value":"!="},{"type":2,"value":" "},{"type":1,"value":"nil"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"panic"},{"type":3,"value":"("},{"type":1,"value":"err"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":1,"value":"type"},{"type":2,"value":" "},{"type":1,"value":"RuneList"},{"type":2,"value":" "},{"type":3,"value":"["},{"type":3,"value":"]"},{"type":1,"value":"rune"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":4,"value":"// Len is the number of elements in the collection."},{"type":2,"value":"\n"},{"type":1,"value":"func"},{"type":2,"value":" "},{"type":3,"value":"("},{"type":1,"value":"r"},{"type":2,"value":" "},{"type":1,"value":"RuneList"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":1,"value":"Len"},{"type":3,"value":"("},{"type":3,"value":")"},{"type":2,"value":" "},{"type":1,"value":"int"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"return"},{"type":2,"value":" "},{"type":1,"value":"len"},{"type":3,"value":"("},{"type":1,"value":"r"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":4,"value":"// Less reports whether the element with"},{"type":2,"value":"\n"},{"type":4,"value":"// index i should sort before the element with index j."},{"type":2,"value":"\n"},{"type":1,"value":"func"},{"type":2,"value":" "},{"type":3,"value":"("},{"type":1,"value":"r"},{"type":2,"value":" "},{"type":1,"value":"RuneList"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":1,"value":"Less"},{"type":3,"value":"("},{"type":1,"value":"i"},{"type":2,"value":" "},{"type":1,"value":"int"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"j"},{"type":2,"value":" "},{"type":1,"value":"int"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":1,"value":"bool"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"return"},{"type":2,"value":" "},{"type":1,"value":"r"},{"type":3,"value":"["},{"type":1,"value":"i"},{"type":3,"value":"]"},{"type":2,"value":" "},{"type":3,"value":"\u003c"},{"type":2,"value":" "},{"type":1,"value":"r"},{"type":3,"value":"["},{"type":1,"value":"j"},{"type":3,"value":"]"},{"type":2,"value":"\n"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":4,"value":"// Swap swaps the elements with indexes i and j."},{"type":2,"value":"\n"},{"type":1,"value":"func"},{"type":2,"value":" "},{"type":3,"value":"("},{"type":1,"value":"r"},{"type":2,"value":" "},{"type":1,"value":"RuneList"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":1,"value":"Swap"},{"type":3,"value":"("},{"type":1,"value":"i"},{"type":2,"value":" "},{"type":1,"value":"int"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"j"},{"type":2,"value":" "},{"type":1,"value":"int"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"r"},{"type":3,"value":"["},{"type":1,"value":"i"},{"type":3,"value":"]"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"r"},{"type":3,"value":"["},{"type":1,"value":"j"},{"type":3,"value":"]"},{"type":2,"value":" "},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"r"},{"type":3,"value":"["},{"type":1,"value":"j"},{"type":3,"value":"]"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"r"},{"type":3,"value":"["},{"type":1,"value":"i"},{"type":3,"value":"]"},{"type":2,"value":"\n"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":1,"value":"var"},{"type":2,"value":" "},{"type":1,"value":"LexCfgVarsFile"},{"type":2,"value":" "},{"type":3,"value":"*"},{"type":1,"value":"os"},{"type":3,"value":"."},{"type":1,"value":"File"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":1,"value":"func"},{"type":2,"value":" "},{"type":1,"value":"SymbolVarCfg"},{"type":3,"value":"("},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"fmt"},{"type":3,"value":"."},{"type":1,"value":"Println"},{"type":3,"value":"("},{"type":7,"value":"\"[start]read symbol list from file and write to code\""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"defer"},{"type":2,"value":" "},{"type":1,"value":"fmt"},{"type":3,"value":"."},{"type":1,"value":"Println"},{"type":3,"value":"("},{"type":7,"value":"\"[end]read symbol list from file and write to code\""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"datas"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"err"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"smn_file"},{"type":3,"value":"."},{"type":1,"value":"FileReadAll"},{"type":3,"value":"("},{"type":7,"value":"\"./datas/analysis/pgl_ana_lex/symbol.cfg\""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"check"},{"type":3,"value":"("},{"type":1,"value":"err"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"charMap"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"map"},{"type":3,"value":"["},{"type":1,"value":"rune"},{"type":3,"value":"]"},{"type":1,"value":"bool"},{"type":3,"value":"{"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"writecv"},{"type":3,"value":"("},{"type":7,"value":"`package pgl_ana_lex\n\nvar SymbolList = map[string]bool{`"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"smbList"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"strings"},{"type":3,"value":"."},{"type":1,"value":"Split"},{"type":3,"value":"("},{"type":1,"value":"string"},{"type":3,"value":"("},{"type":1,"value":"datas"},{"type":3,"value":")"},{"type":3,"value":","},{"type":2,"value":" "},{"type":7,"value":"\"\\n\""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"for"},{"type":2,"value":" "},{"type":1,"value":"i"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"range"},{"type":2,"value":" "},{"type":1,"value":"smbList"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"smbList"},{"type":3,"value":"["},{"type":1,"value":"i"},{"type":3,"value":"]"},{"type":2,"value":" "},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"strings"},{"type":3,"value":"."},{"type":1,"value":"TrimSpace"},{"type":3,"value":"("},{"type":1,"value":"smbList"},{"type":3,"value":"["},{"type":1,"value":"i"},{"type":3,"value":"]"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"smbList"},{"type":3,"value":"["},{"type":1,"value":"i"},{"type":3,"value":"]"},{"type":2,"value":" "},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"strings"},{"type":3,"value":"."},{"type":1,"value":"Replace"},{"type":3,"value":"("},{"type":1,"value":"smbList"},{"type":3,"value":"["},{"type":1,"value":"i"},{"type":3,"value":"]"},{"type":3,"value":","},{"type":2,"value":" "},{"type":7,"value":"\"\\\\\""},{"type":3,"value":","},{"type":2,"value":" "},{"type":7,"value":"\"\\\\\\\\\""},{"type":3,"value":","},{"type":2,"value":" "},{"type":3,"value":"-"},{"type":5,"value":"1"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"line"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"smbList"},{"type":3,"value":"["},{"type":1,"value":"i"},{"type":3,"value":"]"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"if"},{"type":2,"value":" "},{"type":1,"value":"line"},{"type":2,"value":" "},{"type":3,"value":"=="},{"type":2,"value":" "},{"type":7,"value":"\"\""},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"continue"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"for"},{"type":2,"value":" "},{"type":1,"value":"_"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"char"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"range"},{"type":2,"value":" "},{"type":1,"value":"line"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"charMap"},{"type":3,"value":"["},{"type":1,"value":"char"},{"type":3,"value":"]"},{"type":2,"value":" "},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"true"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"writecvf"},{"type":3,"value":"("},{"type":7,"value":"\"\\\"%s\\\":true,\""},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"line"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"charList"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"make"},{"type":3,"value":"("},{"type":1,"value":"RuneList"},{"type":3,"value":","},{"type":2,"value":" "},{"type":5,"value":"0"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"len"},{"type":3,"value":"("},{"type":1,"value":"charMap"},{"type":3,"value":")"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"for"},{"type":2,"value":" "},{"type":1,"value":"char"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"range"},{"type":2,"value":" "},{"type":1,"value":"charMap"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"charList"},{"type":2,"value":" "},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"append"},{"type":3,"value":"("},{"type":1,"value":"charList"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"char"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"sort"},{"type":3,"value":"."},{"type":1,"value":"Sort"},{"type":3,"value":"("},{"type":1,"value":"charList"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"writecv"},{"type":3,"value":"("},{"type":7,"value":"`}\n\nvar SymbolCharSet = map[rune]bool{`"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"for"},{"type":2,"value":" "},{"type":1,"value":"_"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"char"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"range"},{"type":2,"value":" "},{"type":1,"value":"charList"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"if"},{"type":2,"value":" "},{"type":1,"value":"char"},{"type":2,"value":" "},{"type":3,"value":"=="},{"type":2,"value":" "},{"type":7,"value":"'\\\\'"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"writecvf"},{"type":3,"value":"("},{"type":7,"value":"`'\\\\':true,`"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":" "},{"type":1,"value":"else"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"writecvf"},{"type":3,"value":"("},{"type":7,"value":"\"'%c':true,\""},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"char"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"ccMap"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"map"},{"type":3,"value":"["},{"type":1,"value":"string"},{"type":3,"value":"]"},{"type":1,"value":"bool"},{"type":3,"value":"{"},{"type":7,"value":"\"\""},{"type":3,"value":":"},{"type":2,"value":" "},{"type":1,"value":"true"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"writecv"},{"type":3,"value":"("},{"type":7,"value":"`}\n\nvar SymbolCanContinue = map[string]bool{`"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"for"},{"type":2,"value":" "},{"type":1,"value":"_"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"c1"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"range"},{"type":2,"value":" "},{"type":1,"value":"smbList"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"for"},{"type":2,"value":" "},{"type":1,"value":"_"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"c2"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"range"},{"type":2,"value":" "},{"type":1,"value":"smbList"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"if"},{"type":2,"value":" "},{"type":1,"value":"ccMap"},{"type":3,"value":"["},{"type":1,"value":"c2"},{"type":3,"value":"]"},{"type":2,"value":" "},{"type":3,"value":"||"},{"type":2,"value":" "},{"type":1,"value":"c1"},{"type":2,"value":" "},{"type":3,"value":"=="},{"type":2,"value":" "},{"type":1,"value":"c2"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"continue"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"if"},{"type":2,"value":" "},{"type":1,"value":"strings"},{"type":3,"value":"."},{"type":1,"value":"HasPrefix"},{"type":3,"value":"("},{"type":1,"value":"c1"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"c2"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"writecvf"},{"type":3,"value":"("},{"type":7,"value":"\"\\\"%s\\\":true, \""},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"c2"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"ccMap"},{"type":3,"value":"["},{"type":1,"value":"c2"},{"type":3,"value":"]"},{"type":2,"value":" "},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"true"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"writecv"},{"type":3,"value":"("},{"type":7,"value":"`}\n\n//some maybe define in another type, but not as symbol. like comment's \"//\" and \"/*\"\nvar SymbolUnuse = map[string]bool{\"//\":true, \"/*\":true}\n`"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":1,"value":"func"},{"type":2,"value":" "},{"type":1,"value":"NumberVarCfg"},{"type":3,"value":"("},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"fmt"},{"type":3,"value":"."},{"type":1,"value":"Println"},{"type":3,"value":"("},{"type":7,"value":"\"[start]read Number Charset and write to code \""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"defer"},{"type":2,"value":" "},{"type":1,"value":"fmt"},{"type":3,"value":"."},{"type":1,"value":"Println"},{"type":3,"value":"("},{"type":7,"value":"\"[start]read Number Charset and write to code \""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"datas"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"err"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"smn_file"},{"type":3,"value":"."},{"type":1,"value":"FileReadAll"},{"type":3,"value":"("},{"type":7,"value":"\"./datas/analysis/pgl_ana_lex/number.cfg\""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"check"},{"type":3,"value":"("},{"type":1,"value":"err"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"writecv"},{"type":3,"value":"("},{"type":7,"value":"`\n//number charSet\nvar NumberCharSet = map[rune]bool{`"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"for"},{"type":2,"value":" "},{"type":1,"value":"_"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"char"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"range"},{"type":2,"value":" "},{"type":1,"value":"string"},{"type":3,"value":"("},{"type":1,"value":"datas"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"if"},{"type":2,"value":" "},{"type":1,"value":"unicode"},{"type":3,"value":"."},{"type":1,"value":"IsSpace"},{"type":3,"value":"("},{"type":1,"value":"char"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"continue"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":2,"value":"\t"},{"type":1,"value":"writecvf"},{"type":3,"value":"("},{"type":7,"value":"`'%c':true, `"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"char"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"writecv"},{"type":3,"value":"("},{"type":7,"value":"`}\n`"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":1,"value":"func"},{"type":2,"value":" "},{"type":1,"value":"writecv"},{"type":3,"value":"("},{"type":1,"value":"str"},{"type":2,"value":" "},{"type":1,"value":"string"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"_"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"err"},{"type":2,"value":" "},{"type":3,"value":":"},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"LexCfgVarsFile"},{"type":3,"value":"."},{"type":1,"value":"WriteString"},{"type":3,"value":"("},{"type":1,"value":"str"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"check"},{"type":3,"value":"("},{"type":1,"value":"err"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":1,"value":"func"},{"type":2,"value":" "},{"type":1,"value":"writecvf"},{"type":3,"value":"("},{"type":1,"value":"format"},{"type":2,"value":" "},{"type":1,"value":"string"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"a"},{"type":2,"value":" "},{"type":3,"value":"."},{"type":3,"value":"."},{"type":3,"value":"."},{"type":1,"value":"interface"},{"type":3,"value":"{"},{"type":3,"value":"}"},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"writecv"},{"type":3,"value":"("},{"type":1,"value":"fmt"},{"type":3,"value":"."},{"type":1,"value":"Sprintf"},{"type":3,"value":"("},{"type":1,"value":"format"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"a"},{"type":3,"value":"."},{"type":3,"value":"."},{"type":3,"value":"."},{"type":3,"value":")"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":1,"value":"func"},{"type":2,"value":" "},{"type":1,"value":"main"},{"type":3,"value":"("},{"type":3,"value":")"},{"type":2,"value":" "},{"type":3,"value":"{"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"var"},{"type":2,"value":" "},{"type":1,"value":"err"},{"type":2,"value":" "},{"type":1,"value":"error"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"LexCfgVarsFile"},{"type":3,"value":","},{"type":2,"value":" "},{"type":1,"value":"err"},{"type":2,"value":" "},{"type":3,"value":"="},{"type":2,"value":" "},{"type":1,"value":"smn_file"},{"type":3,"value":"."},{"type":1,"value":"CreateNewFile"},{"type":3,"value":"("},{"type":7,"value":"\"./analysis/pgl_ana_lex/cfg_vars.go\""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"defer"},{"type":2,"value":" "},{"type":1,"value":"LexCfgVarsFile"},{"type":3,"value":"."},{"type":1,"value":"Close"},{"type":3,"value":"("},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"check"},{"type":3,"value":"("},{"type":1,"value":"err"},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"fmt"},{"type":3,"value":"."},{"type":1,"value":"Println"},{"type":3,"value":"("},{"type":7,"value":"\"$$$$$$$$$$$$$$$$$$$ start build project $$$$$$$$$$$$$$$$$$$$$\""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":4,"value":"//read symbol list from file and write to code"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"SymbolVarCfg"},{"type":3,"value":"("},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"NumberVarCfg"},{"type":3,"value":"("},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":2,"value":"\t"},{"type":1,"value":"fmt"},{"type":3,"value":"."},{"type":1,"value":"Println"},{"type":3,"value":"("},{"type":7,"value":"\"SUCCESS\""},{"type":3,"value":")"},{"type":2,"value":"\n"},{"type":3,"value":"}"},{"type":2,"value":"\n"},{"type":-1,"value":"end"}]
+PGLA_PRODUCT_IDENT package
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT main
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT import
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_STRING "fmt"
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_STRING "os"
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_STRING "sort"
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_STRING "strings"
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_STRING "unicode"
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_STRING "github.com/ProtossGenius/SureMoonNet/basis/smn_file"
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT func
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT check
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT error
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT if
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL !=
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT nil
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT panic
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT type
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT RuneList
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_IDENT rune
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_COMMENT // Len is the number of elements in the collection.
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT func
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT RuneList
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT Len
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT int
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT return
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT len
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_COMMENT // Less reports whether the element with
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_COMMENT // index i should sort before the element with index j.
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT func
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT RuneList
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT Less
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT int
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT j
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT int
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT bool
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT return
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL <
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT j
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_COMMENT // Swap swaps the elements with indexes i and j.
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT func
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT RuneList
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT Swap
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT int
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT j
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT int
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT j
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT j
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT r
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT var
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT LexCfgVarsFile
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL *
+PGLA_PRODUCT_IDENT os
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT File
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT func
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT SymbolVarCfg
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT fmt
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Println
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "[start]read symbol list from file and write to code"
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT defer
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT fmt
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Println
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "[end]read symbol list from file and write to code"
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT datas
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT smn_file
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT FileReadAll
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "./datas/analysis/pgl_ana_lex/symbol.cfg"
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT check
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT charMap
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT map
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT rune
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_IDENT bool
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecv
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING `package pgl_ana_lex\n\nvar SymbolList = map[string]bool{`
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT smbList
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT strings
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Split
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT string
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT datas
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_STRING "\\n"
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT for
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT range
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT smbList
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT smbList
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT strings
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT TrimSpace
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT smbList
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT smbList
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT strings
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Replace
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT smbList
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_STRING "\\\\"
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_STRING "\\\\\\\\"
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL -
+PGLA_PRODUCT_INTERGER 1
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT line
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT smbList
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT i
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT if
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT line
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL ==
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_STRING ""
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT continue
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT for
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT _
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT range
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT line
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT charMap
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT true
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecvf
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "\\"%s\\":true,"
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT line
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT charList
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT make
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT RuneList
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_INTERGER 0
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT len
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT charMap
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT for
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT range
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT charMap
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT charList
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT append
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT charList
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT sort
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Sort
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT charList
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecv
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING `}\n\nvar SymbolCharSet = map[rune]bool{`
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT for
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT _
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT range
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT charList
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT if
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL ==
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_STRING '\\\\'
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecvf
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING `'\\\\':true,`
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT else
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecvf
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "'%c':true,"
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT ccMap
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT map
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT string
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_IDENT bool
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_STRING ""
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT true
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecv
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING `}\n\nvar SymbolCanContinue = map[string]bool{`
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT for
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT _
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT c1
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT range
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT smbList
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT for
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT _
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT c2
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT range
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT smbList
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT if
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT ccMap
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT c2
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL ||
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT c1
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL ==
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT c2
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT continue
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT if
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT strings
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT HasPrefix
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT c1
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT c2
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecvf
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "\\"%s\\":true, "
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT c2
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT ccMap
+PGLA_PRODUCT_SYMBOL [
+PGLA_PRODUCT_IDENT c2
+PGLA_PRODUCT_SYMBOL ]
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT true
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecv
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING `}\n\n//some maybe define in another type, but not as symbol. like comment's "//" and "/*"\nvar SymbolUnuse = map[string]bool{"//":true, "/*":true}\n`
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT func
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT NumberVarCfg
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT fmt
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Println
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "[start]read Number Charset and write to code "
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT defer
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT fmt
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Println
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "[start]read Number Charset and write to code "
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT datas
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT smn_file
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT FileReadAll
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "./datas/analysis/pgl_ana_lex/number.cfg"
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT check
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecv
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING `\n//number charSet\nvar NumberCharSet = map[rune]bool{`
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT for
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT _
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT range
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT string
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT datas
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT if
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT unicode
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT IsSpace
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT continue
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecvf
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING `'%c':true, `
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT char
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecv
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING `}\n`
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT func
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT writecv
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT str
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT string
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT _
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL :
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT LexCfgVarsFile
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT WriteString
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT str
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT check
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT func
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT writecvf
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT format
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT string
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT a
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT interface
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT writecv
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT fmt
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Sprintf
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT format
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT a
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_IDENT func
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT main
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL {
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT var
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT error
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT LexCfgVarsFile
+PGLA_PRODUCT_SYMBOL ,
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_SYMBOL =
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT smn_file
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT CreateNewFile
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "./analysis/pgl_ana_lex/cfg_vars.go"
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT defer
+PGLA_PRODUCT_SPACE  
+PGLA_PRODUCT_IDENT LexCfgVarsFile
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Close
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT check
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_IDENT err
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT fmt
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Println
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "$$$$$$$$$$$$$$$$$$$ start build project $$$$$$$$$$$$$$$$$$$$$"
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_COMMENT //read symbol list from file and write to code
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT SymbolVarCfg
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT NumberVarCfg
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SPACE 	
+PGLA_PRODUCT_IDENT fmt
+PGLA_PRODUCT_SYMBOL .
+PGLA_PRODUCT_IDENT Println
+PGLA_PRODUCT_SYMBOL (
+PGLA_PRODUCT_STRING "SUCCESS"
+PGLA_PRODUCT_SYMBOL )
+PGLA_PRODUCT_SPACE \n
+PGLA_PRODUCT_SYMBOL }
+PGLA_PRODUCT_SPACE \n
+ end
