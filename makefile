@@ -12,6 +12,6 @@ build: clean
 	go run ./build.go 
 
 clean:
-
+	rm -rf 	./datas/unit/lex_pgl/*.to
 all: test 
 install:
