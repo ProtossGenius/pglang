@@ -183,6 +183,7 @@ const (
 `)
 	writecv(`var PglaNameMap = map[PglaProduct]string{
 `)
+	writecv("-1 : \"EMD\",\n")
 
 	for _, cst := range constList {
 		writecvf("%s:\"%s\",\n", cst, cst)

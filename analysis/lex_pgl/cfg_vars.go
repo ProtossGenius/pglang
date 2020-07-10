@@ -29,6 +29,7 @@ const (
 )
 
 var PglaNameMap = map[PglaProduct]string{
+	-1:                    "EMD",
 	PGLA_PRODUCT_IDENT:    "PGLA_PRODUCT_IDENT",
 	PGLA_PRODUCT_SPACE:    "PGLA_PRODUCT_SPACE",
 	PGLA_PRODUCT_SYMBOL:   "PGLA_PRODUCT_SYMBOL",

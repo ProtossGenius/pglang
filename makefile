@@ -6,7 +6,7 @@ import:
 	cd $(GOPATH)/src/github.com/ProtossGenius/SureMoonNet && make install
 
 
-test:  unit
+test: build  unit
 
 build: clean
 	go run ./build.go 
