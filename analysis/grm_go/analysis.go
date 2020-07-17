@@ -81,6 +81,11 @@ func (p *PackageReader) PreRead(stateNode *smn_analysis.StateNode,
 	return false, nil
 }
 
+//End .
+func (p *PackageReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+	return true, onErr(p, &lex_pgl.LexProduct{Value: "EOF", Type: -1}, "not finish.")
+}
+
 //Read real read. even isEnd == true the input be readed.
 func (p *PackageReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
 	lex := read(input)

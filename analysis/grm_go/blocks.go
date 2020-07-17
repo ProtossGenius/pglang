@@ -114,6 +114,11 @@ func (b *BlockReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analy
 	return false, nil
 }
 
+//End .
+func (b *BlockReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+	return true, onErr(b, &lex_pgl.LexProduct{Value: "EOF", Type: -1}, "except ) or ] or }")
+}
+
 //Read real read. even isEnd == true the input be readed.
 func (b *BlockReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
 	lex := read(input)
