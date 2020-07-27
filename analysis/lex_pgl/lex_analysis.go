@@ -81,18 +81,14 @@ func (this *IdentifierReader) Name() string {
 func (this *IdentifierReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
-	if this.first {
-		if unicode.IsDigit(char) {
-			return true, this.onErr(charStr, "First char can't be Number")
-		}
-		if !unicode.IsLetter(char) && char != '_' {
-			return true, this.onErr(charStr, "Not Identifier")
-		}
-	} else {
-		if !unicode.IsDigit(char) && !unicode.IsLetter(char) && char != '_' {
-			return true, nil
-		}
+	if this.first && !unicode.IsLetter(char) && char != '_' {
+		return true, this.onErr(charStr, "Not Identifier")
 	}
+
+	if !unicode.IsDigit(char) && !unicode.IsLetter(char) && char != '_' {
+		return true, nil
+	}
+
 	return false, nil
 }
 
@@ -106,6 +102,10 @@ func (this *IdentifierReader) Read(stateNode *smn_analysis.StateNode, input smn_
 }
 
 func (this *IdentifierReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
+	if this.first {
+		return true, this.onErr("EOF", "unexpect EOF")
+	}
+
 	return true, nil
 }
 
