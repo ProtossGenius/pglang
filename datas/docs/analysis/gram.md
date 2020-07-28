@@ -26,7 +26,7 @@ var (
 ```
 * func(global)
 ```
-   		func (Scope) func\_name (params) (returns) {code\_block}
+   		func (Scope) func_name (params) (returns) {code_block}
 ```
 * type
    * type type\_name  struct{}
