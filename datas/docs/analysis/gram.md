@@ -4,22 +4,30 @@
 * package
    package pkg\_name
 * imports
-		imports (
-			"A"
-			"B"
-		)
+```
+imports (
+	"A"
+	"B"
+)
+```
 * const
-		const (
-			A
-			B
-		)
+```
+const (
+	A
+	B
+)
+```
 * var
-		var (
-			A
-			B
-		)
+```
+var (
+	A
+	B
+)
+```
 * func(global)
+```
    		func (Scope) func\_name (params) (returns) {code\_block}
+```
 * type
    * type type\_name  struct{}
    * type type\_name interface{}
