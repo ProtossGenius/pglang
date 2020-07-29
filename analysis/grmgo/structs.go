@@ -11,8 +11,8 @@ type GoFile struct {
 	Funcs      []GoFunc //global func
 	Structs    []GoStruct
 	Interfaces []GoItf
-	Aliases    []GoAlias
 	TypeFunc   []GoTypeFunc
+	Aliases    []GoAlias
 }
 
 //GoCodes the code witch not analysis.

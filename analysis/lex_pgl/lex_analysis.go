@@ -29,6 +29,11 @@ func (l *LexProduct) ProductType() int {
 	return int(l.Type)
 }
 
+//Equal equal check.
+func (l *LexProduct) Equal(rhs *LexProduct) bool {
+	return l.Type == rhs.Type && l.Value == rhs.Value
+}
+
 func (p *PglaInput) Copy() smn_analysis.InputItf {
 	return &PglaInput{Char: p.Char}
 }
