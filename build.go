@@ -162,6 +162,7 @@ const (
 
 	constSet := map[string]bool{"": true}
 	constList := []string{}
+	checkList := []string{} //IsXXX(LexProdcut) bool
 
 	for _, line := range strings.Split(string(datas), "\n") {
 		line = strings.Split(line, "#")[0]
@@ -173,6 +174,7 @@ const (
 		}
 
 		constList = append(constList, "PGLA_PRODUCT_"+line)
+		checkList = append(checkList, strings.ToUpper(line[:1])+strings.ToLower(line[1:]))
 		constSet[line] = true
 
 		writecvf("PGLA_PRODUCT_%s\n", line)
@@ -191,6 +193,14 @@ const (
 
 	writecv(`}
 `)
+
+	for _, chk := range checkList {
+		writecvf(`//Is%s chack if lex is %s.
+func Is%s(lex *LexProduct) bool{
+	return lex.ProductType() == int(PGLA_PRODUCT_%s)
+}
+`, chk, chk, chk, strings.ToUpper(chk))
+	}
 }
 
 func main() {

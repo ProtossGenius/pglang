@@ -1,4 +1,4 @@
-package grmgo
+package classifygo
 
 import (
 	"fmt"

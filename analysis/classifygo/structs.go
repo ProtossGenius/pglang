@@ -1,4 +1,4 @@
-package grmgo
+package classifygo
 
 import "github.com/ProtossGenius/pglang/analysis/lex_pgl"
 
@@ -13,6 +13,11 @@ type GoFile struct {
 	Interfaces []GoItf
 	TypeFunc   []GoTypeFunc
 	Aliases    []GoAlias
+}
+
+//ProductType result's type. usually should >= 0.
+func (g *GoFile) ProductType() int {
+	return 1
 }
 
 //GoCodes the code witch not analysis.

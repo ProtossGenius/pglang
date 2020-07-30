@@ -39,3 +39,43 @@ var PglaNameMap = map[PglaProduct]string{
 	PGLA_PRODUCT_STRING:   "PGLA_PRODUCT_STRING",
 	PGLA_PRODUCT_HAN:      "PGLA_PRODUCT_HAN",
 }
+
+//IsIdent chack if lex is Ident.
+func IsIdent(lex *LexProduct) bool {
+	return lex.ProductType() == int(PGLA_PRODUCT_IDENT)
+}
+
+//IsSpace chack if lex is Space.
+func IsSpace(lex *LexProduct) bool {
+	return lex.ProductType() == int(PGLA_PRODUCT_SPACE)
+}
+
+//IsSymbol chack if lex is Symbol.
+func IsSymbol(lex *LexProduct) bool {
+	return lex.ProductType() == int(PGLA_PRODUCT_SYMBOL)
+}
+
+//IsComment chack if lex is Comment.
+func IsComment(lex *LexProduct) bool {
+	return lex.ProductType() == int(PGLA_PRODUCT_COMMENT)
+}
+
+//IsInterger chack if lex is Interger.
+func IsInterger(lex *LexProduct) bool {
+	return lex.ProductType() == int(PGLA_PRODUCT_INTERGER)
+}
+
+//IsDecimal chack if lex is Decimal.
+func IsDecimal(lex *LexProduct) bool {
+	return lex.ProductType() == int(PGLA_PRODUCT_DECIMAL)
+}
+
+//IsString chack if lex is String.
+func IsString(lex *LexProduct) bool {
+	return lex.ProductType() == int(PGLA_PRODUCT_STRING)
+}
+
+//IsHan chack if lex is Han.
+func IsHan(lex *LexProduct) bool {
+	return lex.ProductType() == int(PGLA_PRODUCT_HAN)
+}
