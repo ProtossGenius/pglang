@@ -1,11 +1,13 @@
 package classifygo
 
-import "github.com/ProtossGenius/pglang/analysis/lex_pgl"
+import (
+	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
+)
 
 //GoFile anything in a go file.
 type GoFile struct {
 	Package    string
-	Imports    []string
+	Imports    []*GoImport
 	Consts     []GoConst
 	Vars       []GoVar
 	Funcs      []GoFunc //global func
@@ -22,6 +24,12 @@ func (g *GoFile) ProductType() int {
 
 //GoCodes the code witch not analysis.
 type GoCodes []*lex_pgl.LexProduct
+
+//GoImport .
+type GoImport struct {
+	Path  string
+	Alias string
+}
 
 //GoConst read until '\n' (if meet char ',' Ignore the line's '\n' ).
 type GoConst struct {
