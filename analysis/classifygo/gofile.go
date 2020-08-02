@@ -7,6 +7,10 @@ import (
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 )
 
+/*
+* finished pakcage, import
+ */
+
 //NewAnalysiser new analysiser.
 func NewAnalysiser() (*smn_analysis.StateMachine, *GoFile) {
 	goFile := &GoFile{}
@@ -150,9 +154,8 @@ func (ri *CFGoReadImports) Read(stateNode *smn_analysis.StateNode, input smn_ana
 
 		if lex.Equal(ConstLeftParentheses) {
 			ri.mutiStatus = mutiStatusMuti
+			return false, nil
 		}
-
-		return false, nil
 	}
 
 	if ri.mutiStatus == mutiStatusMuti && lex.Equal(ConstRightParentheses) {
@@ -217,6 +220,10 @@ func (ri *CFGoReadImports) Read(stateNode *smn_analysis.StateNode, input smn_ana
 
 //End when end read.
 func (ri *CFGoReadImports) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+	if ri.first {
+		return true, nil
+	}
+
 	return true, onErr(ri, nil, "Unexcept EOF")
 }
 
