@@ -24,6 +24,8 @@ var ( //symbol
 	ConstLeftParentheses  = constSymbol("(")
 	ConstRightParentheses = constSymbol(")")
 	ConstSemicolon        = constSymbol(";")
+	ConstLeftCurlyBraces  = constSymbol("{")
+	ConstRightCurlyBraces = constSymbol("}")
 )
 
 func constSpace(val string) *lex_pgl.LexProduct {
@@ -32,4 +34,9 @@ func constSpace(val string) *lex_pgl.LexProduct {
 
 var ( //space
 	ConstBreakLine = constSpace("\n")
+)
+
+const ( //Err
+	//ErrUnexceptEOF .
+	ErrUnexceptEOF = "Unexcept EOF"
 )

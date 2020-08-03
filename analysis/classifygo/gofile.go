@@ -18,6 +18,7 @@ func NewAnalysiser() (*smn_analysis.StateMachine, *GoFile) {
 	dft := smn_analysis.NewDftStateNodeReader(sm)
 	dft.Register(&CFGoReadPackage{goFile: goFile})
 	dft.Register(&CFGoReadImports{goFile: goFile})
+	dft.Register(&CFGoReadGlobals{goFile: goFile})
 	return sm, goFile
 }
 
@@ -39,9 +40,6 @@ func ignore(lex *lex_pgl.LexProduct) bool {
 //PreRead only see if should stop read.
 func (rp *CFGoReadPackage) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
 	lex := read(input)
-	if ignore(lex) {
-		return false, nil
-	}
 
 	if rp.first {
 		if !lex.Equal(ConstPackage) {
@@ -120,10 +118,6 @@ func (ri *CFGoReadImports) Name() string {
 func (ri *CFGoReadImports) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
-	if ignore(lex) {
-		return false, nil
-	}
-
 	if ri.first && !lex.Equal(ConstImport) {
 		return true, onErr(ri, lex, "not a import")
 	}
@@ -150,12 +144,12 @@ func (ri *CFGoReadImports) Read(stateNode *smn_analysis.StateNode, input smn_ana
 	}
 
 	if ri.mutiStatus == mutiStatusUnknown {
-		ri.mutiStatus = mutiStatusSingle
-
 		if lex.Equal(ConstLeftParentheses) {
 			ri.mutiStatus = mutiStatusMuti
 			return false, nil
 		}
+
+		ri.mutiStatus = mutiStatusSingle
 	}
 
 	if ri.mutiStatus == mutiStatusMuti && lex.Equal(ConstRightParentheses) {
@@ -184,6 +178,8 @@ func (ri *CFGoReadImports) Read(stateNode *smn_analysis.StateNode, input smn_ana
 		if ri.curAlias != "" {
 			return true, onErr(ri, lex, "expect package path[string], found newline")
 		}
+
+		return false, nil
 	}
 
 	if lex.Equal(ConstSemicolon) {
@@ -220,10 +216,6 @@ func (ri *CFGoReadImports) Read(stateNode *smn_analysis.StateNode, input smn_ana
 
 //End when end read.
 func (ri *CFGoReadImports) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
-	if ri.first {
-		return true, nil
-	}
-
 	return true, onErr(ri, nil, "Unexcept EOF")
 }
 
@@ -238,4 +230,196 @@ func (ri *CFGoReadImports) Clean() {
 	ri.curPath = ""
 	ri.first = true
 	ri.mutiStatus = mutiStatusUnknown
+}
+
+//CFGoReadIgnore ignore the spase between types.
+type CFGoReadIgnore struct {
+}
+
+//Name reader's name.
+func (rign *CFGoReadIgnore) Name() string {
+	return "CFGoReadIgnore"
+}
+
+//PreRead only see if should stop read.
+func (rign *CFGoReadIgnore) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	return false, nil
+}
+
+//Read real read. even isEnd == true the input be readed.
+func (rign *CFGoReadIgnore) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	lex := read(input)
+	if lex_pgl.IsSpace(lex) || lex_pgl.IsComment(lex) {
+		return true, nil
+	}
+
+	return false, onErr(rign, lex, "can't ignore")
+}
+
+//End when end read.
+func (rign *CFGoReadIgnore) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+	return true, nil
+}
+
+//GetProduct return result.
+func (rign *CFGoReadIgnore) GetProduct() smn_analysis.ProductItf {
+	return nil
+}
+
+//Clean let the Reader like new.  it will be call before first Read.
+func (rign *CFGoReadIgnore) Clean() {
+}
+
+//CFGoReadGlobals get consts and vars.
+type CFGoReadGlobals struct {
+	goFile         *GoFile
+	first          bool
+	goBatchGlobals GoBatchGlobals
+	varType        string
+	mutiStatus     int
+	gName          string
+	gCode          GoCodes
+	lleftPNum      int // lonly left parentheses nums;
+	lleftCNum      int //lonly left curly braces nums;
+}
+
+//Clean let the Reader like new.  it will be call before first Read.
+func (rg *CFGoReadGlobals) Clean() {
+	rg.first = true
+	rg.goBatchGlobals = nil
+	rg.mutiStatus = mutiStatusUnknown
+	rg.lleftPNum = 0
+	rg.varType = ""
+	rg.gName = ""
+	rg.gCode = nil
+	rg.lleftCNum = 0
+}
+
+//Name reader's name.
+func (rg *CFGoReadGlobals) Name() string {
+	return "CFGoReadGlobals"
+}
+
+//PreRead only see if should stop read.
+func (rg *CFGoReadGlobals) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	lex := read(input)
+
+	if rg.first && !lex.Equal(ConstConst) && !lex.Equal(ConstVar) {
+		return true, onErr(rg, lex, "not a global value")
+	}
+
+	return false, nil
+}
+
+func (rg *CFGoReadGlobals) checkFinish() string {
+	if rg.varType == "" {
+		return "need const or var"
+	}
+
+	if rg.mutiStatus == mutiStatusSingle && rg.lleftPNum < 0 {
+		return "too much '('"
+	}
+
+	if rg.gName == "" {
+		return "need var name"
+	}
+
+	return ""
+}
+
+func (rg *CFGoReadGlobals) addGlobal(lex *lex_pgl.LexProduct) error {
+	if cf := rg.checkFinish(); cf != "" {
+		return onErr(rg, lex, cf)
+	}
+
+	rg.goBatchGlobals = append(rg.goBatchGlobals, &GoGlobals{Name: rg.gName, Code: rg.gCode})
+	rg.gName = ""
+	rg.gCode = nil
+	return nil
+}
+
+func (rg *CFGoReadGlobals) countLonlyBrackets(lex *lex_pgl.LexProduct) {
+	if lex.Equal(ConstLeftParentheses) {
+		rg.lleftPNum++
+	}
+
+	if lex.Equal(ConstRightParentheses) {
+		rg.lleftPNum--
+	}
+
+	if lex.Equal(ConstLeftCurlyBraces) {
+		rg.lleftCNum++
+	}
+
+	if lex.Equal(ConstRightCurlyBraces) {
+		rg.lleftCNum--
+	}
+}
+
+//Read real read. even isEnd == true the input be readed.
+func (rg *CFGoReadGlobals) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+	lex := read(input)
+
+	if ignore(lex) {
+		return false, nil
+	}
+
+	if rg.first {
+		rg.first, rg.varType = true, lex.Value
+		return false, nil
+	}
+
+	if rg.mutiStatus == mutiStatusUnknown {
+		if lex.Equal(ConstLeftParentheses) {
+			rg.mutiStatus = mutiStatusMuti
+			return false, nil
+		}
+
+		rg.mutiStatus = mutiStatusSingle
+	}
+
+	rg.countLonlyBrackets(lex)
+
+	if rg.mutiStatus == mutiStatusMuti && rg.lleftPNum == -1 {
+		if rg.gName == "" {
+			return true, nil
+		}
+
+		return true, rg.addGlobal(lex)
+	}
+
+	if lex.Equal(ConstBreakLine) {
+		if rg.lleftCNum != 0 {
+			return false, nil
+		}
+
+		if rg.gName == "" && rg.mutiStatus == mutiStatusMuti {
+			return false, nil
+		}
+
+		return rg.mutiStatus == mutiStatusSingle, rg.addGlobal(lex)
+	}
+
+	if rg.gName == "" {
+		if !lex_pgl.IsIdent(lex) {
+			return true, onErr(rg, lex, "var name want a ident")
+		}
+
+		rg.gName = lex.Value
+		return false, nil
+	}
+
+	rg.gCode = append(rg.gCode, lex)
+	return false, nil
+}
+
+//End when end read.
+func (rg *CFGoReadGlobals) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+	return true, onErr(rg, nil, ErrUnexceptEOF)
+}
+
+//GetProduct return result.
+func (rg *CFGoReadGlobals) GetProduct() smn_analysis.ProductItf {
+
+	return nil
 }

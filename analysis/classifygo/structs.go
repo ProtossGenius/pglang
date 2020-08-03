@@ -8,8 +8,8 @@ import (
 type GoFile struct {
 	Package    string
 	Imports    []*GoImport
-	Consts     []GoConst
-	Vars       []GoVar
+	Consts     []GoBatchGlobals
+	Vars       []GoBatchGlobals
 	Funcs      []GoFunc //global func
 	Structs    []GoStruct
 	Interfaces []GoItf
@@ -31,14 +31,11 @@ type GoImport struct {
 	Alias string
 }
 
-//GoConst read until '\n' (if meet char ',' Ignore the line's '\n' ).
-type GoConst struct {
-	Name string
-	Code GoCodes
-}
+//GoBatchGlobals array of GoGlobals.
+type GoBatchGlobals []*GoGlobals
 
-//GoVar like GoConst.
-type GoVar struct {
+//GoGlobals read until '\n' (if meet char ',' Ignore the line's '\n' ).
+type GoGlobals struct {
 	Name string
 	Code GoCodes
 }
