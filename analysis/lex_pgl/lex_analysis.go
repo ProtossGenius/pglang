@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/ProtossGenius/SureMoonNet/basis/smn_analysis"
+	"github.com/ProtossGenius/pglang/snreader"
 )
 
 const (
@@ -21,7 +21,7 @@ type LexProduct struct {
 	Value string      `json:"value"`
 }
 
-func (l *LexProduct) Copy() smn_analysis.InputItf {
+func (l *LexProduct) Copy() snreader.InputItf {
 	return &LexProduct{Type: l.Type, Value: l.Value}
 }
 
@@ -34,27 +34,27 @@ func (l *LexProduct) Equal(rhs *LexProduct) bool {
 	return l.Type == rhs.Type && l.Value == rhs.Value
 }
 
-func (p *PglaInput) Copy() smn_analysis.InputItf {
+func (p *PglaInput) Copy() snreader.InputItf {
 	return &PglaInput{Char: p.Char}
 }
 
-func ToLexProduct(input smn_analysis.ProductItf) *LexProduct {
+func ToLexProduct(input snreader.ProductItf) *LexProduct {
 	product := &LexProduct{Type: PglaProduct(input.ProductType())}
 	switch product.Type {
-	case smn_analysis.ResultEnd:
+	case snreader.ResultEnd:
 		product.Value = "end"
 		return product
-	case smn_analysis.ResultPFromDft:
-		product.Value = input.(*smn_analysis.ProductDftNode).Reason
+	case snreader.ResultPFromDft:
+		product.Value = input.(*snreader.ProductDftNode).Reason
 		return product
-	case smn_analysis.ResultError:
-		product.Value = input.(*smn_analysis.ProductError).Err
+	case snreader.ResultError:
+		product.Value = input.(*snreader.ProductError).Err
 		return product
 	}
 	return input.(*LexProduct)
 }
 
-func read(input smn_analysis.InputItf) rune {
+func read(input snreader.InputItf) rune {
 	return input.(*PglaInput).Char
 }
 
@@ -63,9 +63,9 @@ type IdentifierReader struct {
 	result *LexProduct
 }
 
-func NewLexAnalysiser() *smn_analysis.StateMachine {
-	sm := new(smn_analysis.StateMachine).Init()
-	dft := smn_analysis.NewDftStateNodeReader(sm)
+func NewLexAnalysiser() *snreader.StateMachine {
+	sm := new(snreader.StateMachine).Init()
+	dft := snreader.NewDftStateNodeReader(sm)
 	dft.Register(&IdentifierReader{})
 	dft.Register(&SpaceReader{})
 	dft.Register(&SymbolReader{})
@@ -83,7 +83,7 @@ func (this *IdentifierReader) Name() string {
 }
 
 //only see if should stop read.
-func (this *IdentifierReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (this *IdentifierReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	if this.first && !unicode.IsLetter(char) && char != '_' {
@@ -98,7 +98,7 @@ func (this *IdentifierReader) PreRead(stateNode *smn_analysis.StateNode, input s
 }
 
 //real read. even isEnd == true the input be readed.
-func (this *IdentifierReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (this *IdentifierReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	this.first = false
 	char := read(input)
 	charStr := string([]rune{char})
@@ -106,7 +106,7 @@ func (this *IdentifierReader) Read(stateNode *smn_analysis.StateNode, input smn_
 	return false, nil
 }
 
-func (this *IdentifierReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
+func (this *IdentifierReader) End(stateNode *snreader.StateNode) (bool, error) {
 	if this.first {
 		return true, this.onErr("EOF", "unexpect EOF")
 	}
@@ -115,7 +115,7 @@ func (this *IdentifierReader) End(stateNode *smn_analysis.StateNode) (bool, erro
 }
 
 //return result
-func (this *IdentifierReader) GetProduct() smn_analysis.ProductItf {
+func (this *IdentifierReader) GetProduct() snreader.ProductItf {
 	return this.result
 }
 
@@ -134,7 +134,7 @@ func (p *SpaceReader) Name() string {
 }
 
 //only see if should stop read.
-func (p *SpaceReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (p *SpaceReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	if unicode.IsSpace(char) {
@@ -144,19 +144,19 @@ func (p *SpaceReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analy
 }
 
 //real read. even isEnd == true the input be readed.
-func (p *SpaceReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (p *SpaceReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	p.Result = &LexProduct{Type: PGLA_PRODUCT_SPACE, Value: charStr}
 	return true, nil
 }
 
-func (p *SpaceReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
+func (p *SpaceReader) End(stateNode *snreader.StateNode) (bool, error) {
 	return true, nil
 }
 
 //return result
-func (p *SpaceReader) GetProduct() smn_analysis.ProductItf {
+func (p *SpaceReader) GetProduct() snreader.ProductItf {
 	return p.Result
 }
 
@@ -179,7 +179,7 @@ func (this *SymbolReader) onErr(inputs, reason string) error {
 }
 
 //only see if should stop read.
-func (s *SymbolReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (s *SymbolReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	first := s.Result == ""
@@ -202,18 +202,18 @@ func (s *SymbolReader) PreRead(stateNode *smn_analysis.StateNode, input smn_anal
 }
 
 //real read. even isEnd == true the input be readed.
-func (s *SymbolReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (s *SymbolReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	s.Result += charStr
 	return false, nil
 }
-func (s *SymbolReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
+func (s *SymbolReader) End(stateNode *snreader.StateNode) (bool, error) {
 	return true, nil
 }
 
 //return result
-func (s *SymbolReader) GetProduct() smn_analysis.ProductItf {
+func (s *SymbolReader) GetProduct() snreader.ProductItf {
 	return &LexProduct{Type: PGLA_PRODUCT_SYMBOL, Value: s.Result}
 }
 
@@ -237,7 +237,7 @@ func (c *CommentReader) Name() string {
 }
 
 //only see if should stop read.
-func (c *CommentReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (c *CommentReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	nres := c.Result + charStr
@@ -260,7 +260,7 @@ func (c *CommentReader) PreRead(stateNode *smn_analysis.StateNode, input smn_ana
 }
 
 //real read. even isEnd == true the input be readed.
-func (c *CommentReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (c *CommentReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	c.Result += charStr
@@ -270,7 +270,7 @@ func (c *CommentReader) Read(stateNode *smn_analysis.StateNode, input smn_analys
 	return false, nil
 }
 
-func (c *CommentReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
+func (c *CommentReader) End(stateNode *snreader.StateNode) (bool, error) {
 	if strings.HasPrefix(c.Result, "//") {
 		return true, nil
 	}
@@ -279,7 +279,7 @@ func (c *CommentReader) End(stateNode *smn_analysis.StateNode) (bool, error) {
 }
 
 //return result
-func (c *CommentReader) GetProduct() smn_analysis.ProductItf {
+func (c *CommentReader) GetProduct() snreader.ProductItf {
 	return &LexProduct{Type: PGLA_PRODUCT_COMMENT, Value: c.Result}
 }
 
@@ -304,7 +304,7 @@ func (this *NumberReader) onErr(inputs, reason string) error {
 }
 
 //only see if should stop read.
-func (n *NumberReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (n *NumberReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	nres := n.Result.Value + charStr
@@ -322,19 +322,19 @@ func (n *NumberReader) PreRead(stateNode *smn_analysis.StateNode, input smn_anal
 }
 
 //real read. even isEnd == true the input be readed.
-func (n *NumberReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (n *NumberReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	n.Result.Value += charStr
 	return false, nil
 }
 
-func (n *NumberReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+func (n *NumberReader) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
 	return true, nil
 }
 
 //return result
-func (n *NumberReader) GetProduct() smn_analysis.ProductItf {
+func (n *NumberReader) GetProduct() snreader.ProductItf {
 	return n.Result
 }
 
@@ -358,7 +358,7 @@ func (s *StringReader) Name() string {
 }
 
 //only see if should stop read.
-func (s *StringReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (s *StringReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	if s.result == "" {
@@ -370,7 +370,7 @@ func (s *StringReader) PreRead(stateNode *smn_analysis.StateNode, input smn_anal
 }
 
 //real read. even isEnd == true the input be readed.
-func (s *StringReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (s *StringReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	s.result += charStr
@@ -386,12 +386,12 @@ func (s *StringReader) Read(stateNode *smn_analysis.StateNode, input smn_analysi
 	return false, nil
 }
 
-func (s *StringReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+func (s *StringReader) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
 	return true, s.onErr("EOF", "undexcept EOF")
 }
 
 //return result
-func (s *StringReader) GetProduct() smn_analysis.ProductItf {
+func (s *StringReader) GetProduct() snreader.ProductItf {
 	return &LexProduct{Type: PGLA_PRODUCT_STRING, Value: s.result}
 }
 
@@ -415,7 +415,7 @@ func (this *HanReader) onErr(inputs, reason string) error {
 }
 
 //only see if should stop read.
-func (h *HanReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (h *HanReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	if !unicode.Is(unicode.Han, char) {
@@ -425,19 +425,19 @@ func (h *HanReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysi
 }
 
 //real read. even isEnd == true the input be readed.
-func (h *HanReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (h *HanReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	char := read(input)
 	charStr := string([]rune{char})
 	h.result = &LexProduct{Type: PGLA_PRODUCT_HAN, Value: charStr}
 	return true, nil
 }
 
-func (h *HanReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+func (h *HanReader) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
 	return true, nil
 }
 
 //return result
-func (h *HanReader) GetProduct() smn_analysis.ProductItf {
+func (h *HanReader) GetProduct() snreader.ProductItf {
 	return h.result
 }
 
@@ -446,6 +446,6 @@ func (h *HanReader) Clean() {
 	h.result = nil
 }
 
-func onErr(s smn_analysis.StateNodeReader, inputs, reason string) error {
+func onErr(s snreader.StateNodeReader, inputs, reason string) error {
 	return fmt.Errorf(ErrTypeNotMatch, s.Name(), inputs, reason)
 }

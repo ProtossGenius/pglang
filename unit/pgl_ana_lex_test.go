@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ProtossGenius/SureMoonNet/basis/smn_analysis"
+	"github.com/ProtossGenius/pglang/snreader"
 	"github.com/ProtossGenius/SureMoonNet/basis/smn_file"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 )
@@ -23,7 +23,7 @@ func analysis(str string) ([]*lex_pgl.LexProduct, error) {
 
 	sm.End()
 	rc := sm.GetResultChan()
-	res := make([]smn_analysis.ProductItf, 0, len(rc))
+	res := make([]snreader.ProductItf, 0, len(rc))
 
 	for len(rc) != 0 {
 		res = append(res, <-rc)

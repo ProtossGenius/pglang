@@ -3,19 +3,19 @@ package classifygo
 import (
 	"fmt"
 
-	"github.com/ProtossGenius/SureMoonNet/basis/smn_analysis"
+	"github.com/ProtossGenius/pglang/snreader"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 )
 
 /*
-* finished pakcage, import
+* finished pakcage, import, globals(const, var)
  */
 
 //NewAnalysiser new analysiser.
-func NewAnalysiser() (*smn_analysis.StateMachine, *GoFile) {
+func NewAnalysiser() (*snreader.StateMachine, *GoFile) {
 	goFile := &GoFile{}
-	sm := new(smn_analysis.StateMachine).Init()
-	dft := smn_analysis.NewDftStateNodeReader(sm)
+	sm := new(snreader.StateMachine).Init()
+	dft := snreader.NewDftStateNodeReader(sm)
 	dft.Register(&CFGoReadPackage{goFile: goFile})
 	dft.Register(&CFGoReadImports{goFile: goFile})
 	dft.Register(&CFGoReadGlobals{goFile: goFile})
@@ -38,7 +38,7 @@ func ignore(lex *lex_pgl.LexProduct) bool {
 }
 
 //PreRead only see if should stop read.
-func (rp *CFGoReadPackage) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (rp *CFGoReadPackage) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
 	if rp.first {
@@ -55,7 +55,7 @@ func (rp *CFGoReadPackage) PreRead(stateNode *smn_analysis.StateNode, input smn_
 }
 
 //Read real read. even isEnd == true the input be readed.
-func (rp *CFGoReadPackage) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (rp *CFGoReadPackage) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 	if ignore(lex) {
 		return false, nil
@@ -76,7 +76,7 @@ func (rp *CFGoReadPackage) Read(stateNode *smn_analysis.StateNode, input smn_ana
 }
 
 //End when end read.
-func (rp *CFGoReadPackage) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+func (rp *CFGoReadPackage) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
 	if rp.first {
 		return true, onErr(rp, nil, "unexcpt EOF")
 	}
@@ -85,7 +85,7 @@ func (rp *CFGoReadPackage) End(stateNode *smn_analysis.StateNode) (isEnd bool, e
 }
 
 //GetProduct return result.
-func (rp *CFGoReadPackage) GetProduct() smn_analysis.ProductItf {
+func (rp *CFGoReadPackage) GetProduct() snreader.ProductItf {
 	return nil
 }
 
@@ -115,7 +115,7 @@ func (ri *CFGoReadImports) Name() string {
 }
 
 //PreRead only see if should stop read.
-func (ri *CFGoReadImports) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (ri *CFGoReadImports) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
 	if ri.first && !lex.Equal(ConstImport) {
@@ -131,7 +131,7 @@ func (ri *CFGoReadImports) addImport() {
 }
 
 //Read real read. even isEnd == true the input be readed.
-func (ri *CFGoReadImports) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (ri *CFGoReadImports) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
 	if ignore(lex) {
@@ -215,12 +215,12 @@ func (ri *CFGoReadImports) Read(stateNode *smn_analysis.StateNode, input smn_ana
 }
 
 //End when end read.
-func (ri *CFGoReadImports) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+func (ri *CFGoReadImports) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
 	return true, onErr(ri, nil, "Unexcept EOF")
 }
 
 //GetProduct return result.
-func (ri *CFGoReadImports) GetProduct() smn_analysis.ProductItf {
+func (ri *CFGoReadImports) GetProduct() snreader.ProductItf {
 	return nil
 }
 
@@ -242,12 +242,12 @@ func (rign *CFGoReadIgnore) Name() string {
 }
 
 //PreRead only see if should stop read.
-func (rign *CFGoReadIgnore) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (rign *CFGoReadIgnore) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	return false, nil
 }
 
 //Read real read. even isEnd == true the input be readed.
-func (rign *CFGoReadIgnore) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (rign *CFGoReadIgnore) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 	if lex_pgl.IsSpace(lex) || lex_pgl.IsComment(lex) {
 		return true, nil
@@ -257,12 +257,12 @@ func (rign *CFGoReadIgnore) Read(stateNode *smn_analysis.StateNode, input smn_an
 }
 
 //End when end read.
-func (rign *CFGoReadIgnore) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+func (rign *CFGoReadIgnore) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
 	return true, nil
 }
 
 //GetProduct return result.
-func (rign *CFGoReadIgnore) GetProduct() smn_analysis.ProductItf {
+func (rign *CFGoReadIgnore) GetProduct() snreader.ProductItf {
 	return nil
 }
 
@@ -301,7 +301,7 @@ func (rg *CFGoReadGlobals) Name() string {
 }
 
 //PreRead only see if should stop read.
-func (rg *CFGoReadGlobals) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (rg *CFGoReadGlobals) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
 	if rg.first && !lex.Equal(ConstConst) && !lex.Equal(ConstVar) {
@@ -357,7 +357,7 @@ func (rg *CFGoReadGlobals) countLonlyBrackets(lex *lex_pgl.LexProduct) {
 }
 
 //Read real read. even isEnd == true the input be readed.
-func (rg *CFGoReadGlobals) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (rg *CFGoReadGlobals) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
 	if ignore(lex) {
@@ -414,12 +414,17 @@ func (rg *CFGoReadGlobals) Read(stateNode *smn_analysis.StateNode, input smn_ana
 }
 
 //End when end read.
-func (rg *CFGoReadGlobals) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+func (rg *CFGoReadGlobals) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
 	return true, onErr(rg, nil, ErrUnexceptEOF)
 }
 
 //GetProduct return result.
-func (rg *CFGoReadGlobals) GetProduct() smn_analysis.ProductItf {
+func (rg *CFGoReadGlobals) GetProduct() snreader.ProductItf {
 
 	return nil
+}
+
+//CFGoReadTypes read type XXXX XXXX .
+type CFGoReadTypes struct {
+	tType string
 }

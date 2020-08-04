@@ -3,7 +3,7 @@ package classifygo
 import (
 	"fmt"
 
-	"github.com/ProtossGenius/SureMoonNet/basis/smn_analysis"
+	"github.com/ProtossGenius/pglang/snreader"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 )
 
@@ -13,11 +13,11 @@ type BlockPair struct {
 	End   *lex_pgl.LexProduct
 }
 
-func read(input smn_analysis.InputItf) *lex_pgl.LexProduct {
+func read(input snreader.InputItf) *lex_pgl.LexProduct {
 	return input.(*lex_pgl.LexProduct)
 }
 
-func onErr(reader smn_analysis.StateNodeReader, lex *lex_pgl.LexProduct, reason string) error {
+func onErr(reader snreader.StateNodeReader, lex *lex_pgl.LexProduct, reason string) error {
 	return fmt.Errorf("Error in [%s], input is [%v] reason is: %s", reader.Name(), lex, reason)
 }
 
@@ -36,7 +36,7 @@ func (b *BlockReader) Name() string {
 }
 
 //PreRead only see if should stop read.
-func (b *BlockReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (b *BlockReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
 	if !b.first {
@@ -55,7 +55,7 @@ func (b *BlockReader) PreRead(stateNode *smn_analysis.StateNode, input smn_analy
 }
 
 //Read real read. even isEnd == true the input be readed.
-func (b *BlockReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis.InputItf) (isEnd bool, err error) {
+func (b *BlockReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	b.first = false
 	lex := read(input)
 	b.codes = append(b.codes, lex)
@@ -77,7 +77,7 @@ func (b *BlockReader) Read(stateNode *smn_analysis.StateNode, input smn_analysis
 }
 
 //End when end read.
-func (b *BlockReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err error) {
+func (b *BlockReader) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
 	if b.first && b.CanIgnore {
 		return true, nil
 	}
@@ -86,7 +86,7 @@ func (b *BlockReader) End(stateNode *smn_analysis.StateNode) (isEnd bool, err er
 }
 
 //GetProduct return result.
-func (b *BlockReader) GetProduct() smn_analysis.ProductItf {
+func (b *BlockReader) GetProduct() snreader.ProductItf {
 	return nil
 }
 
