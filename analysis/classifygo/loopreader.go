@@ -7,11 +7,6 @@ import (
 	"github.com/ProtossGenius/pglang/snreader"
 )
 
-//NewStateNodeLoopReader .
-func NewStateNodeLoopReader(looper StateNodeReader, start, end *lex_pgl.LexProduct) StateNodeReader {
-	return &StateNodeLoopReader{looper: looper, start: start, end: end}
-}
-
 //LoopReaderStatus .
 type LoopReaderStatus int
 
@@ -26,12 +21,20 @@ const (
 	LRStatusShouldEnd
 )
 
+//NewStateNodeLoopReader .
+func NewStateNodeLoopReader(looper snreader.StateNodeReader, start, end *lex_pgl.LexProduct, readEnd bool, finishDo func(node *snreader.StateNode)) snreader.StateNodeReader {
+	return &StateNodeLoopReader{looper: looper, start: start, end: end, readEnd: readEnd, finishDo: finishDo}
+}
+
 //StateNodeLoopReader start loop-body end.
 type StateNodeLoopReader struct {
+	looper   snreader.StateNodeReader
+	start    *lex_pgl.LexProduct
+	end      *lex_pgl.LexProduct
+	readEnd  bool // if need eat end(or free it to next Reader.).
+	finishDo func(node *snreader.StateNode)
+
 	status LoopReaderStatus
-	looper snreader.StateNodeReader
-	start  *lex_pgl.LexProduct
-	end    *lex_pgl.LexProduct
 }
 
 //Name reader's name.
@@ -44,6 +47,10 @@ func (lr *StateNodeLoopReader) Clean() {
 	lr.looper.Clean()
 	lr.status = LRStatusStart
 }
+func (lr *StateNodeLoopReader) whenFinish(node *snreader.StateNode) (bool, error) {
+	lr.finishDo(node)
+	return true, nil
+}
 
 //PreRead only see if should stop read.
 func (lr *StateNodeLoopReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
@@ -53,6 +60,11 @@ func (lr *StateNodeLoopReader) PreRead(stateNode *snreader.StateNode, input snre
 		needLoop = false
 		switch lr.status {
 		case LRStatusStart:
+			if lr.start == nil {
+				lr.status = LRStatusLooperReady
+				return false, nil
+			}
+
 			if !lex.Equal(lr.start) {
 				return true, onErr(lr, lex, fmt.Sprintf("Want %v", lr.start))
 			}
@@ -108,7 +120,7 @@ func (lr *StateNodeLoopReader) Read(stateNode *snreader.StateNode, input snreade
 	}
 
 	if lr.status == LRStatusShouldEnd {
-		return true, nil
+		return lr.whenFinish(stateNode)
 	}
 
 	lex := read(input)

@@ -10,11 +10,11 @@ type GoFile struct {
 	Imports    []*GoImport
 	Consts     []GoBatchGlobals
 	Vars       []GoBatchGlobals
-	Funcs      []GoFunc //global func
-	Structs    []GoStruct
-	Interfaces []GoItf
-	TypeFunc   []GoTypeFunc
-	Aliases    []GoAlias
+	Funcs      []*GoFunc //global func
+	Structs    []*GoStruct
+	Interfaces []*GoItf
+	TypeFunc   []*GoTypeFunc
+	Aliases    []*GoAlias
 }
 
 //ProductType result's type. usually should >= 0.

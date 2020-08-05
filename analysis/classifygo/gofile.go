@@ -3,8 +3,8 @@ package classifygo
 import (
 	"fmt"
 
-	"github.com/ProtossGenius/pglang/snreader"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
+	"github.com/ProtossGenius/pglang/snreader"
 )
 
 /*
@@ -424,7 +424,85 @@ func (rg *CFGoReadGlobals) GetProduct() snreader.ProductItf {
 	return nil
 }
 
-//CFGoReadTypes read type XXXX XXXX .
-type CFGoReadTypes struct {
-	tType string
+//CFGoReadIdent read a ident and save it to stateNode's datas.
+type CFGoReadIdent struct {
+	readDo func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error
+}
+
+//Name reader's name.
+func (ridt *CFGoReadIdent) Name() string {
+	return "CFGoReadIdent"
+}
+
+//Clean let the Reader like new.  it will be call before first Read.
+func (ridt *CFGoReadIdent) Clean() {
+}
+
+//PreRead only see if should stop read.
+func (ridt *CFGoReadIdent) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
+	lex := read(input)
+
+	if !lex_pgl.IsIdent(lex) {
+		return true, onErr(ridt, lex, "want a ident.")
+	}
+
+	return false, nil
+}
+
+//Read real read. even isEnd == true the input be readed.
+func (ridt *CFGoReadIdent) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
+	lex := read(input)
+	return true, ridt.readDo(ridt, stateNode, lex)
+}
+
+//End when end read.
+func (ridt *CFGoReadIdent) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
+	return true, onErr(ridt, nil, ErrUnexceptEOF)
+}
+
+//GetProduct return result.
+func (ridt *CFGoReadIdent) GetProduct() snreader.ProductItf {
+	return nil
+}
+
+//NewCFGoReadFuncDef .
+func NewCFGoReadFuncDef(end *lex_pgl.LexProduct, finishDo func(node *snreader.StateNode)) snreader.StateNodeReader {
+	return snreader.NewStateNodeListReader(
+		//read funcName.
+		&CFGoReadIdent{readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
+			stateNode.Datas["funcName"] = lex.Value
+			return nil
+		}},
+		//read params.
+		NewBlockReader(ConstLeftParentheses, ConstRightParentheses, false, "params", nil),
+		//read returns.A
+		//TODO it may end with \n or {
+		NewStateNodeLoopReader(nil, nil, end, false, func(node *snreader.StateNode) {
+			//save to stateNode's datas.
+		}),
+	)
+}
+
+//NewCFGoReadFuncs read funcs.
+func NewCFGoReadFuncs(goFile *GoFile) snreader.StateNodeReader {
+	return snreader.NewStateNodeListReader(
+		//read func.
+		&CFGoReadIdent{readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
+			if !lex.Equal(ConstFuncs) {
+				return onErr(reader, lex, "want a <ident>func")
+			}
+			return nil
+		}},
+		//read scope
+		NewBlockReader(ConstLeftParentheses, ConstRightParentheses, true, "scope", nil),
+		//read codes
+		NewBlockReader(ConstLeftCurlyBraces, ConstRightCurlyBraces, false, "code", func(stateNode *snreader.StateNode) {
+			datas := stateNode.Datas
+			goFile.Funcs = append(goFile.Funcs, &GoFunc{
+				Scope:   datas["scope"].(GoCodes),
+				FuncDef: nil,
+				Codes:   datas["code"].(GoCodes),
+			})
+		}),
+	)
 }

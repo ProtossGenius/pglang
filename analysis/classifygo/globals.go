@@ -11,6 +11,7 @@ var ( //Ident
 	ConstImport    = constIdent("import")
 	ConstVar       = constIdent("var")
 	ConstConst     = constIdent("const")
+	ConstFuncs     = constIdent("func")
 	ConstType      = constIdent("type")
 	ConstStruct    = constIdent("struct")
 	ConstInterface = constIdent("interface")

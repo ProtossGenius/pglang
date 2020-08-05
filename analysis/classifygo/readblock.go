@@ -3,8 +3,8 @@ package classifygo
 import (
 	"fmt"
 
-	"github.com/ProtossGenius/pglang/snreader"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
+	"github.com/ProtossGenius/pglang/snreader"
 )
 
 //BlockPair block pair.
@@ -21,13 +21,21 @@ func onErr(reader snreader.StateNodeReader, lex *lex_pgl.LexProduct, reason stri
 	return fmt.Errorf("Error in [%s], input is [%v] reason is: %s", reader.Name(), lex, reason)
 }
 
+//NewBlockReader .
+func NewBlockReader(start, end *lex_pgl.LexProduct, canIgnore bool, key string, finishDo func(stateNode *snreader.StateNode)) *BlockReader {
+	return &BlockReader{MBlockPair: &BlockPair{start, end}, canIgnore: canIgnore, key: key, finishDo: finishDo}
+}
+
 //BlockReader block reader [{( .. )}].
 type BlockReader struct {
 	MBlockPair *BlockPair
-	first      bool
-	CanIgnore  bool
-	index      int
-	codes      GoCodes
+	canIgnore  bool
+	key        string
+	finishDo   func(stateNode *snreader.StateNode)
+
+	first bool
+	index int
+	codes GoCodes
 }
 
 //Name reader's name.
@@ -44,7 +52,7 @@ func (b *BlockReader) PreRead(stateNode *snreader.StateNode, input snreader.Inpu
 	}
 
 	if !lex.Equal(b.MBlockPair.Start) {
-		if b.CanIgnore {
+		if b.canIgnore {
 			return true, nil
 		}
 
@@ -69,7 +77,10 @@ func (b *BlockReader) Read(stateNode *snreader.StateNode, input snreader.InputIt
 	}
 
 	if b.index == 0 {
-		stateNode.Datas["Block"] = b.codes
+		stateNode.Datas[b.key] = b.codes
+		if b.finishDo != nil {
+			b.finishDo(stateNode)
+		}
 		return true, nil
 	}
 
@@ -78,7 +89,7 @@ func (b *BlockReader) Read(stateNode *snreader.StateNode, input snreader.InputIt
 
 //End when end read.
 func (b *BlockReader) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
-	if b.first && b.CanIgnore {
+	if b.first && b.canIgnore {
 		return true, nil
 	}
 
