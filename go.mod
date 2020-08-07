@@ -31,5 +31,7 @@ require (
 	golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1 // indirect
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
+	golang.org/x/tools v0.0.0-20200806234136-990129eca547 // indirect
 	gopkg.in/readline.v1 v1.0.0-20160726135117-62c6fe619375 // indirect
+	mvdan.cc/gofumpt v0.0.0-20200802201014-ab5a8192947d // indirect
 )

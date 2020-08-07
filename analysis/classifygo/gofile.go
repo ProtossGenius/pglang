@@ -8,7 +8,7 @@ import (
 )
 
 /*
-* finished pakcage, import, globals(const, var)
+* finished pakcage, import, globals(const, var), funcs
  */
 
 //NewAnalysiser new analysiser.
@@ -19,6 +19,7 @@ func NewAnalysiser() (*snreader.StateMachine, *GoFile) {
 	dft.Register(&CFGoReadPackage{goFile: goFile})
 	dft.Register(&CFGoReadImports{goFile: goFile})
 	dft.Register(&CFGoReadGlobals{goFile: goFile})
+	dft.Register(NewCFGoReadFuncs(goFile))
 	return sm, goFile
 }
 
@@ -467,6 +468,7 @@ func (ridt *CFGoReadIdent) GetProduct() snreader.ProductItf {
 
 //NewCFGoReadFuncDef .
 func NewCFGoReadFuncDef(end *lex_pgl.LexProduct, finishDo func(node *snreader.StateNode)) snreader.StateNodeReader {
+
 	return snreader.NewStateNodeListReader(
 		//read funcName.
 		&CFGoReadIdent{readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
@@ -475,10 +477,9 @@ func NewCFGoReadFuncDef(end *lex_pgl.LexProduct, finishDo func(node *snreader.St
 		}},
 		//read params.
 		NewBlockReader(ConstLeftParentheses, ConstRightParentheses, false, "params", nil),
-		//read returns.A
-		//TODO it may end with \n or {
-		NewStateNodeLoopReader(nil, nil, end, false, func(node *snreader.StateNode) {
-			//save to stateNode's datas.
+		//read returns.
+		NewStateNodeLoopReader(NewBlockReader(nil, end, false, "returns", nil), nil, end, false, func(node *snreader.StateNode) {
+			finishDo(node)
 		}),
 	)
 }
@@ -495,12 +496,22 @@ func NewCFGoReadFuncs(goFile *GoFile) snreader.StateNodeReader {
 		}},
 		//read scope
 		NewBlockReader(ConstLeftParentheses, ConstRightParentheses, true, "scope", nil),
+		//read func def
+		NewCFGoReadFuncDef(ConstRightCurlyBraces, func(node *snreader.StateNode) {
+			datas := node.Datas
+			fDef := &GoFuncDef{
+				Name:    datas["funcName"].(string),
+				Params:  datas["params"].(GoCodes),
+				Returns: datas["returns"].(GoCodes),
+			}
+			datas["funcDef"] = fDef
+		}),
 		//read codes
 		NewBlockReader(ConstLeftCurlyBraces, ConstRightCurlyBraces, false, "code", func(stateNode *snreader.StateNode) {
 			datas := stateNode.Datas
 			goFile.Funcs = append(goFile.Funcs, &GoFunc{
 				Scope:   datas["scope"].(GoCodes),
-				FuncDef: nil,
+				FuncDef: datas["funcDef"].(*GoFuncDef),
 				Codes:   datas["code"].(GoCodes),
 			})
 		}),

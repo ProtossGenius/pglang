@@ -81,20 +81,18 @@ func (lr *StateNodeLoopReader) PreRead(stateNode *snreader.StateNode, input snre
 					lr.status = LRStatusLooperReady
 					lr.looper.Clean()
 					needLoop = true
+					continue
 				}
 
 				return false, nil
 			}
-		case LRStatusLooperReady:
+		case LRStatusLooperReady: //after clean.
 			{
-				lend, lerr := lr.looper.PreRead(stateNode, input)
-				if lerr != nil {
-					lr.status = LRStatusShouldEnd
-					return false, nil
-				}
-
+				lend, _ := lr.looper.PreRead(stateNode, input)
 				if lend {
-					return true, onErr(lr, lex, "Unexcept end in looper's PreRead")
+					lr.status = LRStatusShouldEnd
+					needLoop = true
+					continue
 				}
 
 				lr.status = LRStatusLooperGoing

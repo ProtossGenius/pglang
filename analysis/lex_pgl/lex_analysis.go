@@ -31,6 +31,10 @@ func (l *LexProduct) ProductType() int {
 
 //Equal equal check.
 func (l *LexProduct) Equal(rhs *LexProduct) bool {
+	if rhs == nil {
+		return false
+	}
+
 	return l.Type == rhs.Type && l.Value == rhs.Value
 }
 

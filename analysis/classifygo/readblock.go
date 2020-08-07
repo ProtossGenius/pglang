@@ -51,7 +51,7 @@ func (b *BlockReader) PreRead(stateNode *snreader.StateNode, input snreader.Inpu
 		return false, nil
 	}
 
-	if !lex.Equal(b.MBlockPair.Start) {
+	if b.MBlockPair.Start != nil && !lex.Equal(b.MBlockPair.Start) {
 		if b.canIgnore {
 			return true, nil
 		}
