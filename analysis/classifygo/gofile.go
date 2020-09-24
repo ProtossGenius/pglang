@@ -23,6 +23,7 @@ func NewAnalysiser() (*snreader.StateMachine, *GoFile) {
 	dft.Register(&CFGoReadImports{goFile: goFile})
 	dft.Register(&CFGoReadGlobals{goFile: goFile})
 	dft.Register(NewCFGoReadFuncs(goFile))
+	dft.Register(NewCFgoReadTypes(goFile))
 	return sm, goFile
 }
 
@@ -597,12 +598,12 @@ func NewCFgoReadTypes(goFile *GoFile) snreader.StateNodeReader {
 		NewLexChecker(ConstType),
 		// space & coment
 		NewCFReadIgnore(ignore),
-		//read name
-		NewIdentSaver("typeName"),
-		NewCFReadIgnore(ignore),
 		snreader.NewStateNodeSelectReader(
 			// type XXXX struct
 			snreader.NewStateNodeListReader(
+				//read name
+				NewIdentSaver("typeName"),
+				NewCFReadIgnore(ignore),
 				NewLexChecker(ConstStruct),
 				// space & comment.
 				NewCFReadIgnore(ignore),
@@ -616,13 +617,29 @@ func NewCFgoReadTypes(goFile *GoFile) snreader.StateNodeReader {
 			),
 			// type XXXX interface
 			snreader.NewStateNodeListReader(
+				//read name
+				NewIdentSaver("typeName"),
+				NewCFReadIgnore(ignore),
 				NewLexChecker(ConstInterface),
+				NewCFReadIgnore(ignore),
 				NewBlockReader(ConstLeftCurlyBraces, ConstRightCurlyBraces, false, "code", func(stateNode *snreader.StateNode) {
 					datas := stateNode.Datas
 					goFile.Interfaces = append(goFile.Interfaces, &GoItf{Name: datas["typeName"].(string), Codes: datas["code"].(GoCodes)})
 				}),
 			),
+
+			// type XXXX func
 			snreader.NewStateNodeListReader(
+				NewCFGoReadFuncDef(ConstBreakLine, func(stateNode *snreader.StateNode) {
+					datas := stateNode.Datas
+					goFile.TypeFunc = append(goFile.TypeFunc, &GoTypeFunc{Name: datas["funcName"].(string), Params: datas["params"].(GoCodes), Returns: datas["returns"].(GoCodes)})
+				}),
+			),
+			//another
+			snreader.NewStateNodeListReader(
+				//read name
+				NewIdentSaver("typeName"),
+				NewCFReadIgnore(ignore),
 				NewLexExcluder(ConstStruct, ConstInterface),
 				NewBlockReader(nil, ConstBreakLine, false, "code", func(stateNode *snreader.StateNode) {
 					datas := stateNode.Datas
