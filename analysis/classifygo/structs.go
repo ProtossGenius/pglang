@@ -62,8 +62,8 @@ type GoStruct struct {
 
 // GoItf type XXXX interface { []GoFuncDef }.
 type GoItf struct {
-	Name     string
-	FuncDefs []*GoFuncDef
+	Name  string
+	Codes GoCodes
 }
 
 // GoAlias like GoConst .

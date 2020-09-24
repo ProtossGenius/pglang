@@ -6,7 +6,7 @@ func constIdent(val string) *lex_pgl.LexProduct {
 	return &lex_pgl.LexProduct{Type: lex_pgl.PGLA_PRODUCT_IDENT, Value: val}
 }
 
-var ( //Ident
+var ( // Ident
 	ConstPackage   = constIdent("package")
 	ConstImport    = constIdent("import")
 	ConstVar       = constIdent("var")
@@ -15,13 +15,14 @@ var ( //Ident
 	ConstType      = constIdent("type")
 	ConstStruct    = constIdent("struct")
 	ConstInterface = constIdent("interface")
+	ConstMap       = constIdent("map")
 )
 
 func constSymbol(val string) *lex_pgl.LexProduct {
 	return &lex_pgl.LexProduct{Type: lex_pgl.PGLA_PRODUCT_SYMBOL, Value: val}
 }
 
-var ( //symbol
+var ( // symbol
 	ConstLeftParentheses  = constSymbol("(")
 	ConstRightParentheses = constSymbol(")")
 	ConstSemicolon        = constSymbol(";")
@@ -33,11 +34,11 @@ func constSpace(val string) *lex_pgl.LexProduct {
 	return &lex_pgl.LexProduct{Type: lex_pgl.PGLA_PRODUCT_SPACE, Value: val}
 }
 
-var ( //space
+var ( // space
 	ConstBreakLine = constSpace("\n")
 )
 
-const ( //Err
-	//ErrUnexceptEOF .
+const ( // Err
+	// ErrUnexceptEOF .
 	ErrUnexceptEOF = "Unexcept EOF"
 )

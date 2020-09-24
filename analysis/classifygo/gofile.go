@@ -8,7 +8,7 @@ import (
 )
 
 /*
-* finished pakcage, import, globals(const, var), funcs
+* finished pakcage, import, globals(const, var), funcs type.
  */
 
 //NewAnalysiser new analysiser.
@@ -16,7 +16,7 @@ func NewAnalysiser() (*snreader.StateMachine, *GoFile) {
 	goFile := &GoFile{}
 	sm := new(snreader.StateMachine).Init()
 	dft := snreader.NewDftStateNodeReader(sm)
-	dft.Register(NewCFReadIgnore(func(lex *lex_pgl.LexProduct)bool{
+	dft.Register(NewCFReadIgnore(func(lex *lex_pgl.LexProduct) bool {
 		return lex_pgl.IsSpace(lex) || lex_pgl.IsComment(lex)
 	}))
 	dft.Register(&CFGoReadPackage{goFile: goFile})
@@ -237,13 +237,13 @@ func (ri *CFGoReadImports) Clean() {
 }
 
 // NewCFReadIgnore create ignore reader.
-func NewCFReadIgnore(ignoreDo func(lex *lex_pgl.LexProduct) bool) snreader.StateNodeReader{
-	return &cFGoReadIgnore{ignoreDo:ignoreDo}
+func NewCFReadIgnore(ignoreDo func(lex *lex_pgl.LexProduct) bool) snreader.StateNodeReader {
+	return &cFGoReadIgnore{ignoreDo: ignoreDo}
 }
 
 //cFGoReadIgnore ignore the spase between types.
 type cFGoReadIgnore struct {
-	first bool
+	first    bool
 	ignoreDo func(lex *lex_pgl.LexProduct) bool
 }
 
@@ -256,14 +256,15 @@ func (rign *cFGoReadIgnore) Name() string {
 func (rign *cFGoReadIgnore) Clean() {
 	rign.first = true
 }
+
 //PreRead only see if should stop read.
 func (rign *cFGoReadIgnore) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
-	if rign.ignoreDo != nil &&   rign.ignoreDo(lex) {
+	if rign.ignoreDo != nil && rign.ignoreDo(lex) {
 		return false, nil
 	}
 
-	if rign.first{
+	if rign.first { // maybe can returns true, nil
 		return true, onErr(rign, lex, "cant Ignore")
 	}
 
@@ -272,7 +273,7 @@ func (rign *cFGoReadIgnore) PreRead(stateNode *snreader.StateNode, input snreade
 
 //Read real read. even isEnd == true the input be readed.
 func (rign *cFGoReadIgnore) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
-	rign.first = false 
+	rign.first = false
 	return false, nil
 }
 
@@ -285,7 +286,6 @@ func (rign *cFGoReadIgnore) End(stateNode *snreader.StateNode) (isEnd bool, err 
 func (rign *cFGoReadIgnore) GetProduct() snreader.ProductItf {
 	return nil
 }
-
 
 //CFGoReadGlobals get consts and vars.
 type CFGoReadGlobals struct {
@@ -441,45 +441,106 @@ func (rg *CFGoReadGlobals) GetProduct() snreader.ProductItf {
 	return nil
 }
 
-//CFGoReadIdent read a ident and save it to stateNode's datas.
-type CFGoReadIdent struct {
-	readDo func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error
+//CFGoReadLexUnit read a ident and save it to stateNode's datas.
+type CFGoReadLexUnit struct {
+	preCheck func(*lex_pgl.LexProduct) bool
+	readDo   func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error
 }
 
 //Name reader's name.
-func (ridt *CFGoReadIdent) Name() string {
+func (ridt *CFGoReadLexUnit) Name() string {
 	return "CFGoReadIdent"
 }
 
 //Clean let the Reader like new.  it will be call before first Read.
-func (ridt *CFGoReadIdent) Clean() {
+func (ridt *CFGoReadLexUnit) Clean() {
 }
 
 //PreRead only see if should stop read.
-func (ridt *CFGoReadIdent) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
+func (ridt *CFGoReadLexUnit) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
-	if !lex_pgl.IsIdent(lex) {
-		return true, onErr(ridt, lex, "want a ident.")
+	if nil != ridt.preCheck {
+		if ridt.preCheck(lex) {
+			return true, nil
+		}
+
+		return true, onErr(ridt, lex, "preCheck fail")
 	}
 
 	return false, nil
 }
 
 //Read real read. even isEnd == true the input be readed.
-func (ridt *CFGoReadIdent) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
+func (ridt *CFGoReadLexUnit) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 	return true, ridt.readDo(ridt, stateNode, lex)
 }
 
 //End when end read.
-func (ridt *CFGoReadIdent) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
+func (ridt *CFGoReadLexUnit) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
 	return true, onErr(ridt, nil, ErrUnexceptEOF)
 }
 
 //GetProduct return result.
-func (ridt *CFGoReadIdent) GetProduct() snreader.ProductItf {
+func (ridt *CFGoReadLexUnit) GetProduct() snreader.ProductItf {
 	return nil
+}
+
+func NewIdentReader(preCheck func(lex *lex_pgl.LexProduct) bool,
+	readDo func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error) *CFGoReadLexUnit {
+	res := &CFGoReadLexUnit{readDo: readDo}
+	if preCheck != nil {
+		res.preCheck = func(lex *lex_pgl.LexProduct) bool {
+			if !lex_pgl.IsIdent(lex) {
+				return false
+			}
+
+			return preCheck(lex)
+		}
+	} else {
+		res.preCheck = lex_pgl.IsIdent
+	}
+
+	return res
+
+}
+
+// NewIdentSaver read a ident and save to SN.Datas[key].
+func NewIdentSaver(key string) *CFGoReadLexUnit {
+	return NewIdentReader(nil, func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
+		stateNode.Datas[key] = lex.Value
+		return nil
+	})
+}
+
+// NewLexChecker read a ident and check is it equ chk.
+func NewLexChecker(chk *lex_pgl.LexProduct) *CFGoReadLexUnit {
+	return &CFGoReadLexUnit{readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
+		if !lex.Equal(chk) {
+			return onErr(reader, lex, "want a <ident>"+chk.Value)
+		}
+
+		return nil
+	}}
+}
+
+// NewLexPreChecker pre check, not eat the lex.
+func NewLexPreChecker(chk *lex_pgl.LexProduct) *CFGoReadLexUnit {
+	return &CFGoReadLexUnit{preCheck: chk.Equal}
+}
+
+// NewLexExcluder if in excs return error.
+func NewLexExcluder(excs ...*lex_pgl.LexProduct) *CFGoReadLexUnit {
+	return &CFGoReadLexUnit{
+		readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
+			for _, exc := range excs {
+				if lex.Equal(exc) {
+					return onErr(reader, lex, "dont want this Lex")
+				}
+			}
+			return nil
+		}}
 }
 
 //NewCFGoReadFuncDef .
@@ -487,17 +548,12 @@ func NewCFGoReadFuncDef(end *lex_pgl.LexProduct, finishDo func(node *snreader.St
 
 	return snreader.NewStateNodeListReader(
 		//read funcName.
-		&CFGoReadIdent{readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
-			stateNode.Datas["funcName"] = lex.Value
-			return nil
-		}},
+		NewIdentSaver("funcName"),
 		NewCFReadIgnore(ignore),
 		//read params.
 		NewBlockReader(ConstLeftParentheses, ConstRightParentheses, false, "params", nil),
 		//read returns.
-		NewStateNodeLoopReader(NewBlockReader(nil, end, false, "returns", nil), nil, end, false, func(node *snreader.StateNode) {
-			finishDo(node)
-		}),
+		NewEndFlagReader(end, "returns", false, finishDo),
 	)
 }
 
@@ -505,12 +561,7 @@ func NewCFGoReadFuncDef(end *lex_pgl.LexProduct, finishDo func(node *snreader.St
 func NewCFGoReadFuncs(goFile *GoFile) snreader.StateNodeReader {
 	return snreader.NewStateNodeListReader(
 		//read func.
-		&CFGoReadIdent{readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
-			if !lex.Equal(ConstFuncs) {
-				return onErr(reader, lex, "want a <ident>func")
-			}
-			return nil
-		}},
+		NewLexChecker(ConstFuncs),
 		//space & comment
 		NewCFReadIgnore(ignore),
 		//read scope
@@ -536,5 +587,48 @@ func NewCFGoReadFuncs(goFile *GoFile) snreader.StateNodeReader {
 				Codes:   datas["code"].(GoCodes),
 			})
 		}),
+	)
+}
+
+// NewCFgoReadTypes read type XX .
+func NewCFgoReadTypes(goFile *GoFile) snreader.StateNodeReader {
+	return snreader.NewStateNodeListReader(
+		//read type.
+		NewLexChecker(ConstType),
+		// space & coment
+		NewCFReadIgnore(ignore),
+		//read name
+		NewIdentSaver("typeName"),
+		NewCFReadIgnore(ignore),
+		snreader.NewStateNodeSelectReader(
+			// type XXXX struct
+			snreader.NewStateNodeListReader(
+				NewLexChecker(ConstStruct),
+				// space & comment.
+				NewCFReadIgnore(ignore),
+				NewBlockReader(ConstLeftCurlyBraces, ConstRightCurlyBraces, false, "code", func(stateNode *snreader.StateNode) {
+					datas := stateNode.Datas
+					goFile.Structs = append(goFile.Structs, &GoStruct{
+						Name:  datas["typeName"].(string),
+						Codes: datas["code"].(GoCodes),
+					})
+				}),
+			),
+			// type XXXX interface
+			snreader.NewStateNodeListReader(
+				NewLexChecker(ConstInterface),
+				NewBlockReader(ConstLeftCurlyBraces, ConstRightCurlyBraces, false, "code", func(stateNode *snreader.StateNode) {
+					datas := stateNode.Datas
+					goFile.Interfaces = append(goFile.Interfaces, &GoItf{Name: datas["typeName"].(string), Codes: datas["code"].(GoCodes)})
+				}),
+			),
+			snreader.NewStateNodeListReader(
+				NewLexExcluder(ConstStruct, ConstInterface),
+				NewBlockReader(nil, ConstBreakLine, false, "code", func(stateNode *snreader.StateNode) {
+					datas := stateNode.Datas
+					goFile.Aliases = append(goFile.Aliases, &GoAlias{Name: datas["typeName"].(string), Codes: datas["code"].(GoCodes)})
+				}),
+			),
+		),
 	)
 }

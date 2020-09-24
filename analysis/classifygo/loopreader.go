@@ -21,7 +21,9 @@ const (
 	LRStatusShouldEnd
 )
 
-//NewStateNodeLoopReader .
+/*NewStateNodeLoopReader use looper in a scope (between start&end).
+.
+*/
 func NewStateNodeLoopReader(looper snreader.StateNodeReader, start, end *lex_pgl.LexProduct, readEnd bool, finishDo func(node *snreader.StateNode)) snreader.StateNodeReader {
 	return &StateNodeLoopReader{looper: looper, start: start, end: end, readEnd: readEnd, finishDo: finishDo}
 }

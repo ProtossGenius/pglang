@@ -21,21 +21,34 @@ func onErr(reader snreader.StateNodeReader, lex *lex_pgl.LexProduct, reason stri
 	return fmt.Errorf("Error in [%s], input is [%v] reason is: %s", reader.Name(), lex, reason)
 }
 
-//NewBlockReader .
+//NewBlockReader read block.
 func NewBlockReader(start, end *lex_pgl.LexProduct, canIgnore bool, key string, finishDo func(stateNode *snreader.StateNode)) *BlockReader {
+	if end == nil {
+		return nil
+	}
+
 	return &BlockReader{MBlockPair: &BlockPair{start, end}, canIgnore: canIgnore, key: key, finishDo: finishDo}
+}
+
+// NewEndFlagReader read until find the end flag.
+func NewEndFlagReader(endFlag *lex_pgl.LexProduct, key string, readFlag bool, finishDo func(stateNode *snreader.StateNode)) *BlockReader {
+	if endFlag == nil {
+		return nil
+	}
+
+	return &BlockReader{MBlockPair: &BlockPair{nil, endFlag}, canIgnore: false, readEndFlag: readFlag, key: key, finishDo: finishDo}
 }
 
 //BlockReader block reader [{( .. )}].
 type BlockReader struct {
-	MBlockPair *BlockPair
-	canIgnore  bool
-	key        string
-	finishDo   func(stateNode *snreader.StateNode)
-
-	first bool
-	index int
-	codes GoCodes
+	MBlockPair  *BlockPair
+	canIgnore   bool
+	key         string
+	finishDo    func(stateNode *snreader.StateNode)
+	readEndFlag bool
+	first       bool
+	index       int
+	codes       GoCodes
 }
 
 //Name reader's name.
@@ -47,16 +60,26 @@ func (b *BlockReader) Name() string {
 func (b *BlockReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
+	if lex.Equal(b.MBlockPair.End) && b.index == 1 && b.readEndFlag == false {
+		return true, nil
+	}
+
 	if !b.first {
 		return false, nil
 	}
 
-	if b.MBlockPair.Start != nil && !lex.Equal(b.MBlockPair.Start) {
+	if b.MBlockPair.Start == nil {
+		b.index = 1
+
+		return false, nil
+	}
+
+	if !lex.Equal(b.MBlockPair.Start) {
 		if b.canIgnore {
 			return true, nil
 		}
 
-		return true, onErr(b, lex, "")
+		return true, onErr(b, lex, "error in PreRead")
 	}
 
 	return false, nil
@@ -81,6 +104,7 @@ func (b *BlockReader) Read(stateNode *snreader.StateNode, input snreader.InputIt
 		if b.finishDo != nil {
 			b.finishDo(stateNode)
 		}
+
 		return true, nil
 	}
 
