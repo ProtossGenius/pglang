@@ -488,6 +488,7 @@ func (ridt *CFGoReadLexUnit) GetProduct() snreader.ProductItf {
 	return nil
 }
 
+// NewIdentReader .
 func NewIdentReader(preCheck func(lex *lex_pgl.LexProduct) bool,
 	readDo func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error) *CFGoReadLexUnit {
 	res := &CFGoReadLexUnit{readDo: readDo}

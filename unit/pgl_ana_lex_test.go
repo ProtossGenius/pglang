@@ -1,4 +1,4 @@
-package main
+package unit_test
 
 import (
 	"fmt"
@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ProtossGenius/pglang/snreader"
 	"github.com/ProtossGenius/SureMoonNet/basis/smn_file"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
+	"github.com/ProtossGenius/pglang/snreader"
 )
 
 func analysis(str string) ([]*lex_pgl.LexProduct, error) {
@@ -40,17 +40,17 @@ func analysis(str string) ([]*lex_pgl.LexProduct, error) {
 }
 
 const (
-	//LexPath lex-analysis unit test file path.
+	// LexPath lex-analysis unit test file path.
 	LexPath = "../datas/unit/lex_pgl"
-	//LexExt lex-analysis unit test file's extension name.
+	// LexExt lex-analysis unit test file's extension name.
 	LexExt = ".lex"
-	//LexOUnit lex-analysis unit test's output.
+	// LexOUnit lex-analysis unit test's output.
 	LexOUnit = ".to"
-	//LexOStd lex-analysis unite test's std-output(for compare with current output.).
+	// LexOStd lex-analysis unite test's std-output(for compare with current output.).
 	LexOStd = ".std"
 )
 
-func lexWrite(t *testing.T, ext string) {
+func lexWrite(t *testing.T, ext string, doing func(t *testing.T, path string, lexs []*lex_pgl.LexProduct)) {
 	check := func(err error) {
 		if err != nil {
 			t.Fatal(err)
@@ -64,7 +64,8 @@ func lexWrite(t *testing.T, ext string) {
 		check(err)
 		pro, err := analysis(string(datas))
 		check(err)
-		writeLexProduct(t, path+ext, pro)
+		doing(t, path+ext, pro)
+
 		return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 	})
 	check(err)
@@ -72,6 +73,7 @@ func lexWrite(t *testing.T, ext string) {
 
 func strDeal(str string) string {
 	str = strings.ReplaceAll(str, "\\", "\\\\")
+
 	return strings.ReplaceAll(str, "\n", "\\n")
 }
 
@@ -111,12 +113,13 @@ func doCheck(t *testing.T) {
 		if string(dStd) != string(dUnit) {
 			t.Fatalf("Error Result Not Equa.")
 		}
+
 		return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 	})
 	check(err)
 }
 
 func TestAnalysis(t *testing.T) {
-	lexWrite(t, LexOUnit)
+	lexWrite(t, LexOUnit, writeLexProduct)
 	doCheck(t)
 }
