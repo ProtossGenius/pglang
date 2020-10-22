@@ -1,6 +1,8 @@
 package classifygo
 
 import (
+	"strings"
+
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 )
 
@@ -24,6 +26,16 @@ func (g *GoFile) ProductType() int {
 
 // GoCodes the code witch not analysis.
 type GoCodes []*lex_pgl.LexProduct
+
+// Print .
+func (gc GoCodes) String() string {
+	arr := make([]string, 0, len(gc))
+	for _, it := range gc {
+		arr = append(arr, it.Value)
+	}
+
+	return strings.Join(arr, "")
+}
 
 // GoImport .
 type GoImport struct {

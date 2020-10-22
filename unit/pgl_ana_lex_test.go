@@ -50,21 +50,21 @@ const (
 	LexOStd = ".std"
 )
 
-func lexWrite(t *testing.T, ext string, doing func(t *testing.T, path string, lexs []*lex_pgl.LexProduct)) {
+func lexWrite(t *testing.T, lexPath, lexExt, ext string, doing func(t *testing.T, src, out string, lexs []*lex_pgl.LexProduct)) {
 	check := func(err error) {
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
-	_, err := smn_file.DeepTraversalDir(LexPath, func(path string, info os.FileInfo) smn_file.FileDoFuncResult {
-		if info.IsDir() || !strings.HasSuffix(info.Name(), LexExt) {
+	_, err := smn_file.DeepTraversalDir(lexPath, func(path string, info os.FileInfo) smn_file.FileDoFuncResult {
+		if info.IsDir() || !strings.HasSuffix(info.Name(), lexExt) {
 			return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 		}
 		datas, err := smn_file.FileReadAll(path)
 		check(err)
 		pro, err := analysis(string(datas))
 		check(err)
-		doing(t, path+ext, pro)
+		doing(t, path, path+ext, pro)
 
 		return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 	})
@@ -77,14 +77,14 @@ func strDeal(str string) string {
 	return strings.ReplaceAll(str, "\n", "\\n")
 }
 
-func writeLexProduct(t *testing.T, path string, list []*lex_pgl.LexProduct) {
+func writeLexProduct(t *testing.T, src, out string, list []*lex_pgl.LexProduct) {
 	check := func(err error) {
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 
-	f, err := smn_file.CreateNewFile(path)
+	f, err := smn_file.CreateNewFile(out)
 	check(err)
 
 	defer f.Close()
@@ -120,6 +120,6 @@ func doCheck(t *testing.T) {
 }
 
 func TestAnalysis(t *testing.T) {
-	lexWrite(t, LexOUnit, writeLexProduct)
+	lexWrite(t, LexPath, LexExt, LexOUnit, writeLexProduct)
 	doCheck(t)
 }

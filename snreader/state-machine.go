@@ -91,6 +91,7 @@ type StateNode struct {
 func (sn *StateNode) Init(sm *StateMachine, SNReader StateNodeReader) *StateNode {
 	sn.reader = SNReader
 	sn.sm = sm
+	sn.Datas = map[string]interface{}{}
 	return sn
 }
 
@@ -137,8 +138,32 @@ func (sn *StateNode) SendProduct(result ProductItf) {
 	sn.sm.resultChan <- result
 }
 
+// Statistics for error's info.
+type Statistics interface {
+	// Position print current position.
+	Position() string
+	// Read read input and calc position.
+	Read(input InputItf)
+	// Clean .
+	Clean()
+}
+
+type defaultStatistics struct {
+}
+
+// Position print current position.
+func (d *defaultStatistics) Position() string {
+	return ""
+}
+
+// Read read input and calc position.
+func (d *defaultStatistics) Read(input InputItf) {}
+
+func (d *defaultStatistics) Clean() {}
+
 //StateMachine state machine to formulate a state-tree and get result by input.
 type StateMachine struct {
+	Statistic    Statistics
 	ChanSize     int
 	resultChan   chan ProductItf
 	nowStateNode *StateNode
@@ -151,7 +176,7 @@ type StateMachine struct {
 	isReadEnd bool
 }
 
-func (sm *StateMachine) Read(input InputItf) error {
+func (sm *StateMachine) onRead(input InputItf) error {
 	var err error
 	if sm.nowStateNode == nil {
 		sm.useDefault()
@@ -181,6 +206,17 @@ func (sm *StateMachine) Read(input InputItf) error {
 	return nil
 }
 
+func (sm *StateMachine) Read(input InputItf) error {
+	err := sm.onRead(input)
+	if err != nil {
+		return fmt.Errorf("%s\n%v", sm.Statistic.Position(), err)
+	}
+
+	sm.Statistic.Read(input)
+
+	return nil
+}
+
 //IsPreadEnd return the last read status.
 func (sm *StateMachine) IsPreadEnd() bool {
 	return sm.isPreadEnd
@@ -202,6 +238,9 @@ func (sm *StateMachine) Init() *StateMachine {
 		sm.ChanSize = 10000
 	}
 	sm.resultChan = make(chan ProductItf, sm.ChanSize)
+	if sm.Statistic == nil {
+		sm.Statistic = &defaultStatistics{}
+	}
 	return sm
 }
 
@@ -376,16 +415,33 @@ type StateNodeListReader struct {
 	list   []StateNodeReader
 	ptr    int
 	result ProductItf
+	name   string
+}
+
+//Clean let the Reader like new.  it will be call before first Read.
+func (s *StateNodeListReader) Clean() {
+	for _, reader := range s.list {
+		reader.Clean()
+	}
+
+	s.ptr = 0
 }
 
 //NewStateNodeListReader .
-func NewStateNodeListReader(readers ...StateNodeReader) StateNodeReader {
-	return &StateNodeListReader{list: readers, ptr: 0}
+func NewStateNodeListReader(readers ...StateNodeReader) *StateNodeListReader {
+	return &StateNodeListReader{list: readers, ptr: 0, name: "StateNodeListReader"}
+}
+
+// SetName .
+func (s *StateNodeListReader) SetName(name string) *StateNodeListReader {
+	s.name = name
+
+	return s
 }
 
 //Name reader's name.
 func (s *StateNodeListReader) Name() string {
-	return "StateNodeListReader"
+	return s.name
 }
 
 //Current get current StateNodeReader .
@@ -403,57 +459,63 @@ func (s *StateNodeListReader) Size() int {
 	return len(s.list)
 }
 
-func (s *StateNodeListReader) readAction(stateNode *StateNode, input InputItf, cDo func(StateNodeReader) (bool, error)) (isEnd bool, err error) {
-	for {
-		current := s.Current()
-		lend, lerr := cDo(current)
+//PreRead only see if should stop read.
+func (s *StateNodeListReader) PreRead(stateNode *StateNode, input InputItf) (isEnd bool, err error) {
+	loop := true
+	for loop {
+		loop = false
+
+		cur := s.Current()
+
+		lend, lerr := cur.PreRead(stateNode, input)
 		if lerr != nil {
 			return true, lerr
 		}
+
 		if lend {
+			loop = true
 			s.ptr++
-			if s.ptr == s.Size() {
-				stateNode.Result = current.GetProduct()
+
+			if s.ptr == len(s.list) {
+				stateNode.Result = cur.GetProduct()
 				s.result = stateNode.Result
 				return true, nil
 			}
 
 			continue
 		}
-		return false, nil
 	}
-}
 
-//PreRead only see if should stop read.
-func (s *StateNodeListReader) PreRead(stateNode *StateNode, input InputItf) (isEnd bool, err error) {
-	return s.readAction(stateNode, input, func(cur StateNodeReader) (bool, error) {
-		return cur.PreRead(stateNode, input)
-	})
+	return false, nil
 }
 
 //Read real read. even isEnd == true the input be readed.
 func (s *StateNodeListReader) Read(stateNode *StateNode, input InputItf) (isEnd bool, err error) {
-	return s.readAction(stateNode, input, func(cur StateNodeReader) (bool, error) {
-		return cur.Read(stateNode, input)
-	})
+	cur := s.Current()
+	lend, lerr := cur.Read(stateNode, input)
+	if lerr != nil {
+		return true, lerr
+	}
+
+	if lend {
+		s.ptr++
+		if s.ptr == len(s.list) {
+			stateNode.Result = cur.GetProduct()
+			s.result = stateNode.Result
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func (s *StateNodeListReader) End(stateNode *StateNode) (isEnd bool, err error) {
-	return s.readAction(stateNode, nil, func(cur StateNodeReader) (bool, error) {
-		return cur.End(stateNode)
-	})
+	return true, nil
 }
 
 //GetProduct return result.
 func (s *StateNodeListReader) GetProduct() ProductItf {
 	return s.result
-}
-
-//Clean let the Reader like new.  it will be call before first Read.
-func (s *StateNodeListReader) Clean() {
-	for _, reader := range s.list {
-		reader.Clean()
-	}
 }
 
 //StateNodeSelectReader .

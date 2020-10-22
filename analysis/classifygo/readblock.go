@@ -22,21 +22,21 @@ func onErr(reader snreader.StateNodeReader, lex *lex_pgl.LexProduct, reason stri
 }
 
 //NewBlockReader read block.
-func NewBlockReader(start, end *lex_pgl.LexProduct, canIgnore bool, key string, finishDo func(stateNode *snreader.StateNode)) *BlockReader {
+func NewBlockReader(start, end *lex_pgl.LexProduct, canIgnore, readEnd bool, key string, finishDo func(stateNode *snreader.StateNode)) *BlockReader {
 	if end == nil {
 		return nil
 	}
 
-	return &BlockReader{MBlockPair: &BlockPair{start, end}, canIgnore: canIgnore, key: key, finishDo: finishDo}
+	return &BlockReader{MBlockPair: &BlockPair{start, end}, canIgnore: canIgnore, readEndFlag: readEnd, key: key, finishDo: finishDo, name: "BlockReader"}
 }
 
 // NewEndFlagReader read until find the end flag.
-func NewEndFlagReader(endFlag *lex_pgl.LexProduct, key string, readFlag bool, finishDo func(stateNode *snreader.StateNode)) *BlockReader {
+func NewEndFlagReader(endFlag *lex_pgl.LexProduct, key string, readEndFlag bool, finishDo func(stateNode *snreader.StateNode)) *BlockReader {
 	if endFlag == nil {
 		return nil
 	}
 
-	return &BlockReader{MBlockPair: &BlockPair{nil, endFlag}, canIgnore: false, readEndFlag: readFlag, key: key, finishDo: finishDo}
+	return &BlockReader{MBlockPair: &BlockPair{nil, endFlag}, canIgnore: false, readEndFlag: readEndFlag, key: key, finishDo: finishDo}
 }
 
 //BlockReader block reader [{( .. )}].
@@ -49,19 +49,35 @@ type BlockReader struct {
 	first       bool
 	index       int
 	codes       GoCodes
+	name        string
+}
+
+// SetName .
+func (b *BlockReader) SetName(name string) *BlockReader {
+	b.name = name
+	return b
 }
 
 //Name reader's name.
 func (b *BlockReader) Name() string {
-	return "BlockReader"
+	return b.name
 }
 
 //PreRead only see if should stop read.
 func (b *BlockReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
+	if lex.Equal(b.MBlockPair.End) {
+		if b.index == 1 && b.readEndFlag == false {
+			stateNode.Datas[b.key] = b.codes
 
-	if lex.Equal(b.MBlockPair.End) && b.index == 1 && b.readEndFlag == false {
-		return true, nil
+			if b.finishDo != nil {
+				b.finishDo(stateNode)
+			}
+
+			return true, nil
+		}
+
+		return false, nil
 	}
 
 	if !b.first {
@@ -70,7 +86,6 @@ func (b *BlockReader) PreRead(stateNode *snreader.StateNode, input snreader.Inpu
 
 	if b.MBlockPair.Start == nil {
 		b.index = 1
-
 		return false, nil
 	}
 
@@ -79,7 +94,7 @@ func (b *BlockReader) PreRead(stateNode *snreader.StateNode, input snreader.Inpu
 			return true, nil
 		}
 
-		return true, onErr(b, lex, "error in PreRead")
+		return true, onErr(b, lex, "except start-input ["+b.MBlockPair.Start.Value+"]")
 	}
 
 	return false, nil

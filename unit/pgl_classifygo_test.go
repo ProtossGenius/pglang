@@ -7,6 +7,7 @@ import (
 
 	"github.com/ProtossGenius/pglang/analysis/classifygo"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
+	"github.com/ProtossGenius/pglang/snreader"
 )
 
 func goFile2String(t *testing.T, gf *classifygo.GoFile, out io.StringWriter) {
@@ -17,10 +18,10 @@ func goFile2String(t *testing.T, gf *classifygo.GoFile, out io.StringWriter) {
 		}
 	}
 
-	writeln(gf.Package)
+	writeln("package:" + gf.Package)
 
 	for _, it := range gf.Imports {
-		writeln(it.Alias + " " + it.Path)
+		writeln("import:" + it.Alias + " " + it.Path)
 	}
 
 	for _, arr := range gf.Consts {
@@ -60,16 +61,19 @@ func goFile2String(t *testing.T, gf *classifygo.GoFile, out io.StringWriter) {
 	}
 }
 
-func classifygoAnalysis(t *testing.T, path string, list []*lex_pgl.LexProduct) {
+func classifygoAnalysis(t *testing.T, src, out string, list []*lex_pgl.LexProduct) {
 	check := func(err error) {
 		if err != nil {
-			t.Fatal(path, ":", err)
+			t.Fatal(err)
 		}
 	}
 
-	sm, gof := classifygo.NewAnalysiser()
+	sm, gof := classifygo.NewAnalysiser(src)
 
 	for _, lex := range list {
+		if lex.ProductType() == snreader.ResultEnd {
+			break
+		}
 		err := sm.Read(lex)
 		check(err)
 	}
@@ -78,5 +82,5 @@ func classifygoAnalysis(t *testing.T, path string, list []*lex_pgl.LexProduct) {
 }
 
 func TestClassifygo(t *testing.T) {
-	lexWrite(t, LexOUnit, classifygoAnalysis)
+	lexWrite(t, "../datas/unit/grm_go", ".go", LexOUnit, classifygoAnalysis)
 }
