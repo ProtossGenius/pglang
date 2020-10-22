@@ -2,9 +2,9 @@ package unit_test
 
 import (
 	"io"
-	"os"
 	"testing"
 
+	"github.com/ProtossGenius/SureMoonNet/basis/smn_file"
 	"github.com/ProtossGenius/pglang/analysis/classifygo"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 	"github.com/ProtossGenius/pglang/snreader"
@@ -78,9 +78,14 @@ func classifygoAnalysis(t *testing.T, src, out string, list []*lex_pgl.LexProduc
 		check(err)
 	}
 
-	goFile2String(t, gof, os.Stdout)
+	of, err := smn_file.CreateNewFile(out)
+	check(err)
+	defer of.Close()
+
+	goFile2String(t, gof, of)
 }
 
 func TestClassifygo(t *testing.T) {
 	lexWrite(t, "../datas/unit/grm_go", ".go", LexOUnit, classifygoAnalysis)
+	doCheck(t, "../datas/unit/grm_go", ".go")
 }

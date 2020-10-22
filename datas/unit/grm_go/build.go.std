@@ -1,0 +1,19 @@
+package:main
+import: "fmt"
+import: "os"
+import: "sort"
+import: "strings"
+import: "unicode"
+import: "github.com/ProtossGenius/SureMoonNet/basis/smn_exec"
+import: "github.com/ProtossGenius/SureMoonNet/basis/smn_file"
+func:check
+func:Len
+func:Less
+func:Swap
+func:SymbolVarCfg
+func:NumberVarCfg
+func:writecv
+func:writecvf
+func:LexTypesCfg
+func:main
+aliase:RuneList

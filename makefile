@@ -13,5 +13,6 @@ build: clean
 
 clean:
 	rm -rf 	./datas/unit/lex_pgl/*.to
+	rm -rf ./datas/unit/grm_go/*.to
 all: test 
 install:

@@ -95,14 +95,14 @@ func writeLexProduct(t *testing.T, src, out string, list []*lex_pgl.LexProduct) 
 	}
 }
 
-func doCheck(t *testing.T) {
+func doCheck(t *testing.T, lexPath, lexExt string) {
 	check := func(err error) {
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
-	_, err := smn_file.DeepTraversalDir(LexPath, func(path string, info os.FileInfo) smn_file.FileDoFuncResult {
-		if info.IsDir() || !strings.HasSuffix(info.Name(), LexExt) {
+	_, err := smn_file.DeepTraversalDir(lexPath, func(path string, info os.FileInfo) smn_file.FileDoFuncResult {
+		if info.IsDir() || !strings.HasSuffix(info.Name(), lexExt) {
 			return smn_file.FILE_DO_FUNC_RESULT_DEFAULT
 		}
 		t.Logf("dealing sameple file .....         %s", path)
@@ -121,5 +121,5 @@ func doCheck(t *testing.T) {
 
 func TestAnalysis(t *testing.T) {
 	lexWrite(t, LexPath, LexExt, LexOUnit, writeLexProduct)
-	doCheck(t)
+	doCheck(t, LexPath, LexExt)
 }
