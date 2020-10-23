@@ -17,15 +17,15 @@ const (
 	LRStatusLooperReady
 	//LRStatusLooperGoing looper is reading.
 	LRStatusLooperGoing
-	//LRStatusShouldEnd in PreRead & looper is ready & looper returns a error.
-	LRStatusShouldEnd
+	// LRStatusLooperEnd looper end in preread.
+	LRStatusLooperEnd
 )
 
 /*NewStateNodeLoopReader use looper in a scope (between start&end).
 .
 */
-func NewStateNodeLoopReader(looper snreader.StateNodeReader, start, end *lex_pgl.LexProduct, readEnd bool, finishDo func(node *snreader.StateNode)) snreader.StateNodeReader {
-	return &StateNodeLoopReader{looper: looper, start: start, end: end, readEnd: readEnd, finishDo: finishDo}
+func NewStateNodeLoopReader(looper snreader.StateNodeReader, start, end *lex_pgl.LexProduct, readEnd bool, finishDo func(node *snreader.StateNode)) *StateNodeLoopReader {
+	return &StateNodeLoopReader{looper: looper, start: start, end: end, readEnd: readEnd, finishDo: finishDo, name: "StateNodeLoopReader"}
 }
 
 //StateNodeLoopReader start loop-body end.
@@ -35,13 +35,19 @@ type StateNodeLoopReader struct {
 	end      *lex_pgl.LexProduct
 	readEnd  bool // if need eat end(or free it to next Reader.).
 	finishDo func(node *snreader.StateNode)
+	name     string
+	status   LoopReaderStatus
+}
 
-	status LoopReaderStatus
+// SetName .
+func (lr *StateNodeLoopReader) SetName(name string) *StateNodeLoopReader {
+	lr.name = name
+	return lr
 }
 
 //Name reader's name.
 func (lr *StateNodeLoopReader) Name() string {
-	return "StateNodeLoopReader"
+	return lr.name
 }
 
 //Clean let the Reader like new.  it will be call before first Read.
@@ -50,63 +56,47 @@ func (lr *StateNodeLoopReader) Clean() {
 	lr.status = LRStatusStart
 }
 func (lr *StateNodeLoopReader) whenFinish(node *snreader.StateNode) (bool, error) {
-	lr.finishDo(node)
+	if lr.finishDo != nil {
+		lr.finishDo(node)
+	}
 	return true, nil
 }
 
 //PreRead only see if should stop read.
 func (lr *StateNodeLoopReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
-	needLoop := true
-	for needLoop {
-		needLoop = false
-		switch lr.status {
-		case LRStatusStart:
-			if lr.start == nil {
-				lr.status = LRStatusLooperReady
-				return false, nil
-			}
-
-			if !lex.Equal(lr.start) {
-				return true, onErr(lr, lex, fmt.Sprintf("Want %v", lr.start))
-			}
-
+	fmt.Println("......StateNodeLoopReader PreRead", lex_pgl.PglaNameMap[lex.Type], lex.Value)
+	if lr.end == nil {
+		return true, onErr(lr, lex, "StateNodeLoopReader's end should't be nil")
+	}
+	if lr.status == LRStatusStart {
+		lr.status = LRStatusLooperReady
+		if lr.start == nil || lex.Equal(lr.start) {
 			return false, nil
-		case LRStatusLooperGoing:
-			{
-				lend, lerr := lr.looper.PreRead(stateNode, input)
-				if lerr != nil {
-					return true, onErr(lr, lex, lerr.Error())
-				}
-
-				if lend {
-					lr.status = LRStatusLooperReady
-					lr.looper.Clean()
-					needLoop = true
-					continue
-				}
-
-				return false, nil
-			}
-		case LRStatusLooperReady: //after clean.
-			{
-				lend, _ := lr.looper.PreRead(stateNode, input)
-				if lend {
-					lr.status = LRStatusShouldEnd
-					needLoop = true
-					continue
-				}
-
-				lr.status = LRStatusLooperGoing
-				return false, nil
-			}
-		case LRStatusShouldEnd:
-			{
-				if !lex.Equal(lr.end) {
-					return true, onErr(lr, lex, fmt.Sprintf("Want %v", lr.end))
-				}
-			}
 		}
+
+		return true, onErr(lr, lex, "first input except "+lex.Value)
+	}
+
+	if lr.status == LRStatusLooperReady {
+		if lex.Equal(lr.end) {
+			if lr.readEnd {
+				return false, nil
+			}
+
+			return lr.whenFinish(stateNode)
+		}
+	}
+
+	lr.status = LRStatusLooperGoing
+
+	lend, lerr := lr.looper.PreRead(stateNode, input)
+	if lerr != nil {
+		return true, onErr(lr, lex, lerr.Error())
+	}
+	if lend {
+		lr.looper.Clean()
+		lr.status = LRStatusLooperEnd
 	}
 
 	return false, nil
@@ -114,16 +104,26 @@ func (lr *StateNodeLoopReader) PreRead(stateNode *snreader.StateNode, input snre
 
 //Read real read. even isEnd == true the input be readed.
 func (lr *StateNodeLoopReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
+	lex := read(input)
+	fmt.Println("......StateNodeLoopReader Read", lex_pgl.PglaNameMap[lex.Type], lex.Value)
 	if lr.status == LRStatusStart {
-		lr.status = LRStatusLooperReady
 		return false, nil
 	}
 
-	if lr.status == LRStatusShouldEnd {
-		return lr.whenFinish(stateNode)
+	if lr.status == LRStatusLooperEnd {
+		lr.status = LRStatusLooperReady
+
+		return false, nil
 	}
 
-	lex := read(input)
+	if lr.status == LRStatusLooperReady {
+		if lex.Equal(lr.end) {
+			return lr.whenFinish(stateNode)
+		}
+	}
+
+	lr.status = LRStatusLooperEnd
+
 	lend, lerr := lr.looper.Read(stateNode, input)
 	if lerr != nil {
 		return true, onErr(lr, lex, lerr.Error())

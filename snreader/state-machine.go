@@ -300,11 +300,20 @@ type DftStateNodeReader struct {
 	sm        *StateMachine
 	SNodeList []*StateNode
 	LiveMap   map[*StateNode]byte
+
+	name string
+}
+
+// SetName .
+func (dsn *DftStateNodeReader) SetName(name string) *DftStateNodeReader {
+	dsn.name = name
+
+	return dsn
 }
 
 //Name reader's name.
 func (dsn *DftStateNodeReader) Name() string {
-	return "DftStateNodeReader"
+	return dsn.name
 }
 
 //GetProduct .
@@ -330,7 +339,7 @@ func (dsn *DftStateNodeReader) GetProduct() ProductItf {
 
 //NewDftStateNodeReader .
 func NewDftStateNodeReader(machine *StateMachine) *DftStateNodeReader {
-	dft := &DftStateNodeReader{sm: machine, SNodeList: make([]*StateNode, 0), LiveMap: make(map[*StateNode]byte)}
+	dft := &DftStateNodeReader{sm: machine, name: "DftStateNodeReader", SNodeList: make([]*StateNode, 0), LiveMap: make(map[*StateNode]byte)}
 	machine.DftStateNode = (&StateNode{}).Init(machine, dft)
 	return dft
 }
@@ -371,11 +380,11 @@ func (dsn *DftStateNodeReader) readAction(stateNode *StateNode, input InputItf, 
 	}
 
 	if len(dsn.LiveMap) == 0 {
-		return true, fmt.Errorf(ErrNoMatchStateNode, errStr)
+		return true, OnErr(dsn, input, fmt.Sprintf(ErrNoMatchStateNode, errStr))
 	}
 
 	if len(endNode) > 1 || (len(endNode) == 1 && len(livedNode) > 1) {
-		return true, fmt.Errorf(ErrTooMuchStateNodeLive, input, strings.Join(livedNode, ", "), strings.Join(endNode, ", "))
+		return true, OnErr(dsn, input, fmt.Sprintf(ErrTooMuchStateNodeLive, input, strings.Join(livedNode, ", "), strings.Join(endNode, ", ")))
 	}
 
 	if len(endNode) == 1 {
@@ -469,7 +478,7 @@ func (s *StateNodeListReader) PreRead(stateNode *StateNode, input InputItf) (isE
 
 		lend, lerr := cur.PreRead(stateNode, input)
 		if lerr != nil {
-			return true, lerr
+			return true, OnErr(s, input, lerr.Error())
 		}
 
 		if lend {
@@ -494,7 +503,7 @@ func (s *StateNodeListReader) Read(stateNode *StateNode, input InputItf) (isEnd 
 	cur := s.Current()
 	lend, lerr := cur.Read(stateNode, input)
 	if lerr != nil {
-		return true, lerr
+		return true, OnErr(s, input, lerr.Error())
 	}
 
 	if lend {
@@ -556,7 +565,7 @@ func (s *StateNodeSelectReader) readAction(stateNode *StateNode, input InputItf,
 		}
 	}
 	if len(s.LiveMap) == 0 {
-		return true, fmt.Errorf("Error in StateNodeSelectReader.%s, error list : \n%s", actName, strings.Join(errList, "\n"))
+		return true, OnErr(s, input, fmt.Sprintf("actName: %s, error list : \n%s", actName, strings.Join(errList, "\n")))
 	}
 	return false, nil
 }

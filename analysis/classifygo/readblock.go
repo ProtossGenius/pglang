@@ -1,8 +1,6 @@
 package classifygo
 
 import (
-	"fmt"
-
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 	"github.com/ProtossGenius/pglang/snreader"
 )
@@ -18,7 +16,7 @@ func read(input snreader.InputItf) *lex_pgl.LexProduct {
 }
 
 func onErr(reader snreader.StateNodeReader, lex *lex_pgl.LexProduct, reason string) error {
-	return fmt.Errorf("Error in [%s], input is [%v] reason is: %s", reader.Name(), lex, reason)
+	return snreader.OnErr(reader, lex, reason)
 }
 
 //NewBlockReader read block.

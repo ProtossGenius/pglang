@@ -30,6 +30,7 @@ func strLen(str string) int {
 // Read read input and calc position.
 func (s *statistics) Read(input snreader.InputItf) {
 	lex := read(input)
+	fmt.Println(lex_pgl.PglaNameMap[lex.Type], strings.ReplaceAll(strings.ReplaceAll(lex.Value, "\\", "\\\\"), "\n", "\\n"))
 	if strings.Contains(lex.Value, "\n") {
 		spls := strings.Split(lex.Value, "\n")
 		s.col = strLen(spls[len(spls)-1])
@@ -50,12 +51,10 @@ func NewAnalysiser(path string) (*snreader.StateMachine, *GoFile) {
 	goFile := &GoFile{}
 	sm := new(snreader.StateMachine).Init()
 	sm.Statistic = &statistics{path: path}
-	dft := snreader.NewDftStateNodeReader(sm)
-	dft.Register(NewCFReadIgnore(func(lex *lex_pgl.LexProduct) bool {
-		return lex_pgl.IsSpace(lex) || lex_pgl.IsComment(lex)
-	}, IgnoreTypeWithError))
+	dft := snreader.NewDftStateNodeReader(sm).SetName("ClassifyGoAnalysiser")
+	dft.Register(NewCFReadIgnore(ignoreAll, IgnoreTypeWithError))
 	dft.Register(&CFGoReadPackage{goFile: goFile})
-	dft.Register(&CFGoReadImports{goFile: goFile})
+	dft.Register(NewCFGoImports(goFile))
 	dft.Register(&CFGoReadGlobals{goFile: goFile})
 	dft.Register(NewCFGoReadFuncs(goFile))
 	dft.Register(NewCFgoReadTypes(goFile))
@@ -73,8 +72,12 @@ func (rp *CFGoReadPackage) Name() string {
 	return "CFGoReadPackage"
 }
 
-func ignore(lex *lex_pgl.LexProduct) bool {
+func ignoreWithoutBreakline(lex *lex_pgl.LexProduct) bool {
 	return (lex_pgl.IsSpace(lex) && lex.Value != "\n") || lex_pgl.IsComment(lex)
+}
+
+func ignoreAll(lex *lex_pgl.LexProduct) bool {
+	return lex_pgl.IsSpace(lex) || lex_pgl.IsComment(lex)
 }
 
 //PreRead only see if should stop read.
@@ -98,7 +101,7 @@ func (rp *CFGoReadPackage) PreRead(stateNode *snreader.StateNode, input snreader
 func (rp *CFGoReadPackage) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
-	if ignore(lex) {
+	if ignoreWithoutBreakline(lex) {
 		return false, nil
 	}
 
@@ -141,138 +144,6 @@ const (
 	mutiStatusMuti    = 2 //muti. import("" "")
 )
 
-//CFGoReadImports read imports.
-type CFGoReadImports struct {
-	first      bool
-	mutiStatus int // import("" "" )
-	curPath    string
-	curAlias   string
-	goFile     *GoFile
-}
-
-//Name reader's name.
-func (ri *CFGoReadImports) Name() string {
-	return "CFGoReadImports"
-}
-
-//PreRead only see if should stop read.
-func (ri *CFGoReadImports) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
-	lex := read(input)
-
-	if ri.first && !lex.Equal(ConstImport) {
-		return true, onErr(ri, lex, "not a import")
-	}
-	return false, nil
-}
-
-func (ri *CFGoReadImports) addImport() {
-	ri.goFile.Imports = append(ri.goFile.Imports, &GoImport{Path: ri.curPath, Alias: ri.curAlias})
-	ri.curPath = ""
-	ri.curAlias = ""
-}
-
-//Read real read. even isEnd == true the input be readed.
-func (ri *CFGoReadImports) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
-	lex := read(input)
-
-	if ignore(lex) {
-		return false, nil
-	}
-
-	if ri.first { // import
-		ri.first = false
-		return false, nil
-	}
-
-	if ri.mutiStatus == mutiStatusUnknown {
-		if lex.Equal(ConstLeftParentheses) {
-			ri.mutiStatus = mutiStatusMuti
-			return false, nil
-		}
-
-		ri.mutiStatus = mutiStatusSingle
-	}
-
-	if ri.mutiStatus == mutiStatusMuti && lex.Equal(ConstRightParentheses) {
-		if ri.curPath != "" {
-			ri.addImport()
-		}
-
-		return true, nil
-	}
-
-	if lex.Equal(ConstBreakLine) {
-		if ri.mutiStatus == mutiStatusSingle {
-			if ri.curPath == "" {
-				return true, onErr(ri, lex, "expect package path[string]")
-			}
-
-			ri.addImport()
-			return true, nil
-		}
-		//mutiStatusMuti
-		if ri.curPath != "" {
-			ri.addImport()
-			return false, nil
-		}
-		//curPath == ""
-		if ri.curAlias != "" {
-			return true, onErr(ri, lex, "expect package path[string], found newline")
-		}
-
-		return false, nil
-	}
-
-	if lex.Equal(ConstSemicolon) {
-		if ri.curPath == "" {
-			return true, onErr(ri, lex, "except package path[string]")
-		}
-
-		if ri.mutiStatus == mutiStatusMuti {
-			ri.addImport()
-		}
-
-		return false, nil
-	}
-
-	if lex_pgl.IsIdent(lex) {
-		if ri.curAlias != "" {
-			return true, onErr(ri, lex, fmt.Sprintf("import Alias[%s] exist.", ri.curAlias))
-		}
-
-		ri.curAlias = lex.Value
-		return false, nil
-	}
-
-	if lex_pgl.IsString(lex) {
-		if ri.curPath != "" {
-			return true, onErr(ri, lex, fmt.Sprintf("import Path[%s] exist.", ri.curPath))
-		}
-
-		ri.curPath = lex.Value
-	}
-
-	return false, nil
-}
-
-//End when end read.
-func (ri *CFGoReadImports) End(stateNode *snreader.StateNode) (isEnd bool, err error) {
-	return true, onErr(ri, nil, "Unexcept EOF")
-}
-
-//GetProduct return result.
-func (ri *CFGoReadImports) GetProduct() snreader.ProductItf {
-	return nil
-}
-
-//Clean let the Reader like new.  it will be call before first Read.
-func (ri *CFGoReadImports) Clean() {
-	ri.curPath = ""
-	ri.curPath = ""
-	ri.first = true
-	ri.mutiStatus = mutiStatusUnknown
-}
-
 // IgnoreType .
 type IgnoreType int
 
@@ -306,6 +177,7 @@ func (rign *CFGoReadIgnore) Clean() {
 //PreRead only see if should stop read.
 func (rign *CFGoReadIgnore) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
+	fmt.Println("CFGoReadIgnore")
 	ignore := false
 	if rign.ignoreWhat != nil && rign.ignoreWhat(lex) {
 		ignore = true
@@ -385,7 +257,7 @@ func (rg *CFGoReadGlobals) PreRead(stateNode *snreader.StateNode, input snreader
 func (rg *CFGoReadGlobals) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 
-	if ignore(lex) {
+	if ignoreWithoutBreakline(lex) {
 		return false, nil
 	}
 
@@ -496,7 +368,7 @@ func (rg *CFGoReadGlobals) GetProduct() snreader.ProductItf {
 
 //CFGoReadLexUnit read a ident and save it to stateNode's datas.
 type CFGoReadLexUnit struct {
-	preCheck func(*lex_pgl.LexProduct) bool
+	preCheck func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) (isEnd bool, err error)
 	readDo   func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error
 	name     string
 }
@@ -521,11 +393,7 @@ func (ridt *CFGoReadLexUnit) Clean() {
 func (ridt *CFGoReadLexUnit) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
 	if nil != ridt.preCheck {
-		if ridt.preCheck(lex) {
-			return false, nil
-		}
-
-		return true, onErr(ridt, lex, "preCheck fail")
+		return ridt.preCheck(ridt, stateNode, lex)
 	}
 
 	return false, nil
@@ -533,6 +401,10 @@ func (ridt *CFGoReadLexUnit) PreRead(stateNode *snreader.StateNode, input snread
 
 //Read real read. even isEnd == true the input be readed.
 func (ridt *CFGoReadLexUnit) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
+	if ridt.readDo == nil {
+		return true, nil
+	}
+
 	lex := read(input)
 	return true, ridt.readDo(ridt, stateNode, lex)
 }
@@ -548,19 +420,25 @@ func (ridt *CFGoReadLexUnit) GetProduct() snreader.ProductItf {
 }
 
 // NewIdentReader .
-func NewIdentReader(preCheck func(lex *lex_pgl.LexProduct) bool,
+func NewIdentReader(preCheck func(lex *lex_pgl.LexProduct) (isEnd bool, err error),
 	readDo func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error) *CFGoReadLexUnit {
 	res := &CFGoReadLexUnit{readDo: readDo}
 	if preCheck != nil {
-		res.preCheck = func(lex *lex_pgl.LexProduct) bool {
+		res.preCheck = func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) (bool, error) {
 			if !lex_pgl.IsIdent(lex) {
-				return false
+				return true, onErr(res, lex, "except a Ident")
 			}
 
 			return preCheck(lex)
 		}
 	} else {
-		res.preCheck = lex_pgl.IsIdent
+		res.preCheck = func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) (bool, error) {
+			if !lex_pgl.IsIdent(lex) {
+				return true, onErr(res, lex, "except a Ident")
+			}
+
+			return false, nil
+		}
 	}
 
 	return res.SetName("IdentReader")
@@ -586,9 +464,18 @@ func NewLexChecker(chk *lex_pgl.LexProduct) *CFGoReadLexUnit {
 	}, name: "LexChecker"}
 }
 
-// NewLexPreChecker pre check, not eat the lex.
+// NewLexPreChecker pre check, is not eqa will not read, if eqa will eat it.
 func NewLexPreChecker(chk *lex_pgl.LexProduct) *CFGoReadLexUnit {
-	return &CFGoReadLexUnit{preCheck: chk.Equal}
+	res := &CFGoReadLexUnit{}
+	res.preCheck = func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) (isEnd bool, err error) {
+		if chk.Equal(lex) { // if eqa then goto read and eat it.
+			return false, nil
+		}
+
+		return true, nil
+	}
+
+	return res
 }
 
 // NewLexExcluder if in excs return error.
@@ -610,7 +497,7 @@ func NewCFGoReadFuncDef(end *lex_pgl.LexProduct, finishDo func(node *snreader.St
 	return snreader.NewStateNodeListReader(
 		//read funcName.
 		NewIdentSaver("funcName"),
-		NewCFReadIgnore(ignore, IgnoreTypeNoError),
+		NewCFReadIgnore(ignoreWithoutBreakline, IgnoreTypeNoError),
 		//read params.
 		NewBlockReader(ConstLeftParentheses, ConstRightParentheses, false, true, "params", nil).SetName("FuncDefParamsReader"),
 		//read returns.
@@ -624,11 +511,11 @@ func NewCFGoReadFuncs(goFile *GoFile) snreader.StateNodeReader {
 		//read func.
 		NewLexChecker(ConstFuncs),
 		//space & comment
-		NewCFReadIgnore(ignore, IgnoreTypeNoError),
+		NewCFReadIgnore(ignoreWithoutBreakline, IgnoreTypeNoError),
 		//read scope
 		NewBlockReader(ConstLeftParentheses, ConstRightParentheses, true, true, "scope", nil).SetName("FuncScopeReader"),
 		//space & comment
-		NewCFReadIgnore(ignore, IgnoreTypeNoError),
+		NewCFReadIgnore(ignoreWithoutBreakline, IgnoreTypeNoError),
 		//read func def
 		NewCFGoReadFuncDef(ConstLeftCurlyBraces, func(node *snreader.StateNode) {
 			datas := node.Datas
@@ -662,16 +549,16 @@ func NewCFgoReadTypes(goFile *GoFile) snreader.StateNodeReader {
 		//read type.
 		NewLexChecker(ConstType),
 		// space & coment
-		&CFGoReadIgnore{ignore, IgnoreTypeNoError},
+		&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
 		snreader.NewStateNodeSelectReader(
 			// type XXXX struct
 			snreader.NewStateNodeListReader(
 				//read name
 				NewIdentSaver("typeName"),
-				&CFGoReadIgnore{ignore, IgnoreTypeNoError},
+				&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
 				NewLexChecker(ConstStruct),
 				// space & comment.
-				&CFGoReadIgnore{ignore, IgnoreTypeNoError},
+				&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
 				NewBlockReader(ConstLeftCurlyBraces, ConstRightCurlyBraces, false, true, "code", func(stateNode *snreader.StateNode) {
 					datas := stateNode.Datas
 					goFile.Structs = append(goFile.Structs, &GoStruct{
@@ -679,33 +566,35 @@ func NewCFgoReadTypes(goFile *GoFile) snreader.StateNodeReader {
 						Codes: datas["code"].(GoCodes),
 					})
 				}),
-			),
+			).SetName("CFGoTypeStructReader"),
 			// type XXXX interface
 			snreader.NewStateNodeListReader(
 				//read name
 				NewIdentSaver("typeName"),
-				&CFGoReadIgnore{ignore, IgnoreTypeNoError},
+				&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
 				NewLexChecker(ConstInterface),
-				&CFGoReadIgnore{ignore, IgnoreTypeNoError},
+				&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
 				NewBlockReader(ConstLeftCurlyBraces, ConstRightCurlyBraces, false, true, "code", func(stateNode *snreader.StateNode) {
 					datas := stateNode.Datas
 					goFile.Interfaces = append(goFile.Interfaces, &GoItf{Name: datas["typeName"].(string), Codes: datas["code"].(GoCodes)})
 				}),
-			),
+			).SetName("CFGoTypeInterfaceReader"),
 
 			// type XXXX func
 			snreader.NewStateNodeListReader(
+				&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
+				NewLexChecker(ConstFuncs),
 				NewCFGoReadFuncDef(ConstBreakLine, func(stateNode *snreader.StateNode) {
 					datas := stateNode.Datas
 					goFile.TypeFunc = append(goFile.TypeFunc, &GoTypeFunc{Name: datas["funcName"].(string), Params: datas["params"].(GoCodes), Returns: datas["returns"].(GoCodes)})
 				}),
-			),
+			).SetName("CFGoTypeFuncReader"),
 			//another
 			snreader.NewStateNodeListReader(
 				//read name
 				NewIdentSaver("typeName"),
-				&CFGoReadIgnore{ignore, IgnoreTypeNoError},
-				NewLexExcluder(ConstStruct, ConstInterface),
+				&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
+				NewLexExcluder(ConstStruct, ConstInterface, ConstFuncs),
 				NewBlockReader(nil, ConstBreakLine, false, true, "code", func(stateNode *snreader.StateNode) {
 					datas := stateNode.Datas
 					goFile.Aliases = append(goFile.Aliases, &GoAlias{Name: datas["typeName"].(string), Codes: datas["code"].(GoCodes)})
@@ -713,4 +602,68 @@ func NewCFgoReadTypes(goFile *GoFile) snreader.StateNodeReader {
 			),
 		),
 	).SetName("CFGoTypeReader")
+}
+
+// import alias<ident> path<string>
+func newGoOneImport(goFile *GoFile) *snreader.StateNodeListReader {
+	return snreader.NewStateNodeListReader(
+		// read alias name.
+		&CFGoReadLexUnit{
+			preCheck: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) (isEnd bool, err error) {
+				fmt.Println("?????????????????????")
+				// if is ident then read it
+				return !lex_pgl.IsIdent(lex), nil
+			},
+			readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
+				fmt.Println("!!!!!!!!!!!11 when read lias name, lex = ", lex.Value)
+				stateNode.Datas["alias"] = lex.Value
+				return nil
+			},
+		},
+		&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
+		&CFGoReadLexUnit{
+			preCheck: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) (isEnd bool, err error) {
+				if !lex_pgl.IsString(lex) {
+					return true, onErr(reader, lex, "except a string for import path")
+				}
+				return false, nil
+			},
+			readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
+				fmt.Println("read ... .. .", lex.Value)
+				vAlias := stateNode.Datas["alias"]
+				alias := ""
+				if vAlias != nil {
+					alias = vAlias.(string)
+				}
+				stateNode.Datas["alias"] = ""
+				goFile.Imports = append(goFile.Imports, &GoImport{Path: lex.Value, Alias: alias})
+				return nil
+			},
+		},
+		&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
+		NewLexPreChecker(ConstSemicolon),
+		&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
+		NewLexPreChecker(ConstBreakLine),
+	)
+}
+
+// NewCFGoImports .
+func NewCFGoImports(goFile *GoFile) snreader.StateNodeReader {
+	return snreader.NewStateNodeListReader(
+		//read import
+		NewLexChecker(ConstImport).SetName("ImportReader-ReadImport"),
+		//read ignore
+		&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
+		//select one or muti-import
+		snreader.NewStateNodeSelectReader(
+			// import xxx "xxx"
+			newGoOneImport(goFile).SetName("OneImportReader"),
+			// import ( ... )
+			NewStateNodeLoopReader(snreader.NewStateNodeListReader(
+				//read ignroe (all-type sapce and comment)
+				&CFGoReadIgnore{ignoreAll, IgnoreTypeNoError},
+				newGoOneImport(goFile),
+			).SetName("MutiImportLoopUnit"), ConstLeftParentheses, ConstRightParentheses, true, nil).SetName("MutiImportReader"),
+		),
+	).SetName("CFGoImportReader")
 }
