@@ -30,7 +30,6 @@ func strLen(str string) int {
 // Read read input and calc position.
 func (s *statistics) Read(input snreader.InputItf) {
 	lex := read(input)
-	fmt.Println(lex_pgl.PglaNameMap[lex.Type], strings.ReplaceAll(strings.ReplaceAll(lex.Value, "\\", "\\\\"), "\n", "\\n"))
 	if strings.Contains(lex.Value, "\n") {
 		spls := strings.Split(lex.Value, "\n")
 		s.col = strLen(spls[len(spls)-1])
@@ -177,7 +176,6 @@ func (rign *CFGoReadIgnore) Clean() {
 //PreRead only see if should stop read.
 func (rign *CFGoReadIgnore) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
-	fmt.Println("CFGoReadIgnore")
 	ignore := false
 	if rign.ignoreWhat != nil && rign.ignoreWhat(lex) {
 		ignore = true
@@ -610,12 +608,10 @@ func newGoOneImport(goFile *GoFile) *snreader.StateNodeListReader {
 		// read alias name.
 		&CFGoReadLexUnit{
 			preCheck: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) (isEnd bool, err error) {
-				fmt.Println("?????????????????????")
 				// if is ident then read it
 				return !lex_pgl.IsIdent(lex), nil
 			},
 			readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
-				fmt.Println("!!!!!!!!!!!11 when read lias name, lex = ", lex.Value)
 				stateNode.Datas["alias"] = lex.Value
 				return nil
 			},
@@ -629,7 +625,6 @@ func newGoOneImport(goFile *GoFile) *snreader.StateNodeListReader {
 				return false, nil
 			},
 			readDo: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) error {
-				fmt.Println("read ... .. .", lex.Value)
 				vAlias := stateNode.Datas["alias"]
 				alias := ""
 				if vAlias != nil {

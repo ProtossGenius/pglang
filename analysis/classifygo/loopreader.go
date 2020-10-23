@@ -1,8 +1,6 @@
 package classifygo
 
 import (
-	"fmt"
-
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 	"github.com/ProtossGenius/pglang/snreader"
 )
@@ -65,7 +63,6 @@ func (lr *StateNodeLoopReader) whenFinish(node *snreader.StateNode) (bool, error
 //PreRead only see if should stop read.
 func (lr *StateNodeLoopReader) PreRead(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
-	fmt.Println("......StateNodeLoopReader PreRead", lex_pgl.PglaNameMap[lex.Type], lex.Value)
 	if lr.end == nil {
 		return true, onErr(lr, lex, "StateNodeLoopReader's end should't be nil")
 	}
@@ -105,7 +102,6 @@ func (lr *StateNodeLoopReader) PreRead(stateNode *snreader.StateNode, input snre
 //Read real read. even isEnd == true the input be readed.
 func (lr *StateNodeLoopReader) Read(stateNode *snreader.StateNode, input snreader.InputItf) (isEnd bool, err error) {
 	lex := read(input)
-	fmt.Println("......StateNodeLoopReader Read", lex_pgl.PglaNameMap[lex.Type], lex.Value)
 	if lr.status == LRStatusStart {
 		return false, nil
 	}
