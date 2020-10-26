@@ -462,8 +462,8 @@ func NewLexChecker(chk *lex_pgl.LexProduct) *CFGoReadLexUnit {
 	}, name: "LexChecker"}
 }
 
-// NewLexPreChecker pre check, is not eqa will not read, if eqa will eat it.
-func NewLexPreChecker(chk *lex_pgl.LexProduct) *CFGoReadLexUnit {
+// NewLexTryRead try read a lex, if not eqa will not read, if eqa will eat it.
+func NewLexTryRead(chk *lex_pgl.LexProduct) *CFGoReadLexUnit {
 	res := &CFGoReadLexUnit{}
 	res.preCheck = func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) (isEnd bool, err error) {
 		if chk.Equal(lex) { // if eqa then goto read and eat it.
@@ -474,6 +474,27 @@ func NewLexPreChecker(chk *lex_pgl.LexProduct) *CFGoReadLexUnit {
 	}
 
 	return res
+}
+
+// NewLexPreCheck if input in set then return success, or return error.
+func NewLexPreCheck(chk ...*lex_pgl.LexProduct) *CFGoReadLexUnit {
+	cMap := make(map[string]*lex_pgl.LexProduct, len(chk))
+
+	for _, it := range chk {
+		cMap[it.Value] = it
+	}
+
+	return &CFGoReadLexUnit{
+		preCheck: func(reader snreader.StateNodeReader, stateNode *snreader.StateNode, lex *lex_pgl.LexProduct) (isEnd bool, err error) {
+			if val, exist := cMap[lex.Value]; exist {
+				if val.Equal(lex) {
+					return true, nil
+				}
+			}
+
+			return true, onErr(reader, lex, "not except Input")
+		},
+	}
 }
 
 // NewLexExcluder if in excs return error.
@@ -636,9 +657,9 @@ func newGoOneImport(goFile *GoFile) *snreader.StateNodeListReader {
 			},
 		},
 		&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
-		NewLexPreChecker(ConstSemicolon),
+		NewLexTryRead(ConstSemicolon),
 		&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
-		NewLexPreChecker(ConstBreakLine),
+		NewLexTryRead(ConstBreakLine),
 	)
 }
 
@@ -661,4 +682,19 @@ func NewCFGoImports(goFile *GoFile) snreader.StateNodeReader {
 			).SetName("MutiImportLoopUnit"), ConstLeftParentheses, ConstRightParentheses, true, nil).SetName("MutiImportReader"),
 		),
 	).SetName("CFGoImportReader")
+}
+
+// NewCFGoReadGoType .
+func NewCFGoReadGoType() {
+}
+
+// NewCFGoReadGlobals .
+func NewCFGoReadGlobals(goFile *GoFile) snreader.StateNodeReader {
+	return snreader.NewStateNodeListReader(
+		// must be const or var
+		NewLexPreCheck(ConstVar, ConstType),
+		NewIdentSaver("type"),
+		&CFGoReadIgnore{ignoreWithoutBreakline, IgnoreTypeNoError},
+		snreader.NewStateNodeSelectReader(),
+	)
 }

@@ -23,11 +23,13 @@ func constSymbol(val string) *lex_pgl.LexProduct {
 }
 
 var ( // symbol
-	ConstLeftParentheses  = constSymbol("(")
-	ConstRightParentheses = constSymbol(")")
-	ConstSemicolon        = constSymbol(";")
-	ConstLeftCurlyBraces  = constSymbol("{")
-	ConstRightCurlyBraces = constSymbol("}")
+	ConstLeftParentheses     = constSymbol("(")
+	ConstRightParentheses    = constSymbol(")")
+	ConstSemicolon           = constSymbol(";")
+	ConstLeftCurlyBraces     = constSymbol("{")
+	ConstRightCurlyBraces    = constSymbol("}")
+	ConstLeftSquareBrackets  = constSymbol("[")
+	ConstRightSquareBrackets = constSymbol("]")
 )
 
 func constSpace(val string) *lex_pgl.LexProduct {
