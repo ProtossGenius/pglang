@@ -16,3 +16,6 @@ clean:
 	rm -rf ./datas/unit/grm_go/*.to
 all: test 
 install:
+	smdcatalog
+rely:
+	go get github.com/ProtossGenius/smntools/cmd/smdcatalog
