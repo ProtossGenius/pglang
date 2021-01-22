@@ -41,10 +41,12 @@ github.com/ProtossGenius/SureMoonNet v0.0.0-20200729133110-9a34d132ab33/go.mod h
 github.com/ProtossGenius/SureMoonNet v0.0.0-20200803141800-d5b5c4ccabe0 h1:EVslkyzfqfuFqdCqArtCRQVuJlq4YYyJl6Ztv7aY2pk=
 github.com/ProtossGenius/SureMoonNet v0.0.0-20201218063202-acc2c9884990 h1:lmepKrsM052Uyr+IUgPVl6WZ/UJvG50/GkGcWM6Xj9Q=
 github.com/ProtossGenius/SureMoonNet v0.0.0-20201218063202-acc2c9884990/go.mod h1:HhO2evNCWgr+uw5S+yAkx/I/xAGiSCCaZq+pj4x7xF0=
+github.com/ProtossGenius/SureMoonNet v0.0.0-20210122152944-8e0fa1767087 h1:rFJYsZbS+h92xZkf7r88pPvmD1dzV9Hg1v+DHXAvEe8=
+github.com/ProtossGenius/SureMoonNet v0.0.0-20210122152944-8e0fa1767087/go.mod h1:HhO2evNCWgr+uw5S+yAkx/I/xAGiSCCaZq+pj4x7xF0=
+github.com/ProtossGenius/SureMoonNet v0.0.0-20210122154146-6cf3ce452acf h1:deNIyXv38nzoz/lkw8/Cb0VsLq65TQH7WKIjANK4FlY=
+github.com/ProtossGenius/SureMoonNet v0.0.0-20210122154146-6cf3ce452acf/go.mod h1:HhO2evNCWgr+uw5S+yAkx/I/xAGiSCCaZq+pj4x7xF0=
 github.com/ProtossGenius/pglang v0.0.0-20200717110701-36e48cc808c8/go.mod h1:lfe8umNoPd1yrGfKNOGicauiXZHKqIzXGD0Ol23kGHM=
 github.com/ProtossGenius/pglang v0.0.0-20200808150637-5881d210e079/go.mod h1:UMxUA4xIUoRUc3ig5iWm3gcpbjcvUAAnyHTJSVyWWFg=
-github.com/ProtossGenius/smn-cpp v0.0.0-20200605081320-4de0f87e059d/go.mod h1:LoCLyGaS0GC9cOD5dcBV1ULkRHF5txwVUg4eepcxgeg=
-github.com/ProtossGenius/smn-cpp v0.0.0-20200805043758-9668faa4fe3f/go.mod h1:LoCLyGaS0GC9cOD5dcBV1ULkRHF5txwVUg4eepcxgeg=
 github.com/ProtossGenius/smntools v0.0.0-20200520072714-534c87925479/go.mod h1:hUUzj3mblHxQNz1sNTi9k1ZbCRQbbGh6c170tVTrHbM=
 github.com/ProtossGenius/smntools v0.0.0-20200529112536-ce620f794186 h1:rdaB4OF5kjy+IxFoy8s6lSddSVnQO/jkad8cwUQ73no=
 github.com/ProtossGenius/smntools v0.0.0-20200529112536-ce620f794186/go.mod h1:5XP6xb/nndSUIuO0zMtytzmk/vEwzF0obcBDuyh3OFs=

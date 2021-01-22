@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/DataDog/zstd v1.4.5 // indirect
-	github.com/ProtossGenius/SureMoonNet v0.0.0-20201218063202-acc2c9884990
+	github.com/ProtossGenius/SureMoonNet v0.0.0-20210122154146-6cf3ce452acf
 	github.com/ProtossGenius/smntools v0.0.0-20200803070554-cfd66ec81b21 // indirect
 	github.com/ProtossGenius/srfile v0.0.0-20200601032907-0258f7e1b3ac // indirect
 	github.com/ccding/go-stun v0.1.2 // indirect
