@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/DataDog/zstd v1.4.5 // indirect
-	github.com/ProtossGenius/SureMoonNet v0.0.0-20210122160313-6536d58d8755
+	github.com/ProtossGenius/SureMoonNet v0.0.0-20210122161924-b686fe77b050
 	github.com/ccding/go-stun v0.1.2 // indirect
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
