@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ProtossGenius/SureMoonNet/basis/smn_analysis"
+	"github.com/ProtossGenius/smnric/smn_analysis"
 	"github.com/ProtossGenius/pglang/analysis/lex_pgl"
 )
 
